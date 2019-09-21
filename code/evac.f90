@@ -71,6 +71,12 @@ MODULE EVAC
      INTEGER, POINTER, DIMENSION(:) :: I_DOOR_NODES =>NULL()
      INTEGER, POINTER, DIMENSION(:) :: I_VENT_FFIELDS =>NULL()
      REAL(EB), POINTER, DIMENSION(:) :: P_VENT_FFIELDS =>NULL()
+     REAL(EB), DIMENSION(0:8) :: GROUP_DFACTOR = 0.0_EB
+     REAL(EB), DIMENSION(0:8) :: GROUP_BFACTOR = 0.0_EB
+     REAL(EB), DIMENSION(0:8) :: GROUP_AFACTOR = 0.0_EB
+     !INTEGER :: N_GROUP_RELATION = 0
+     !INTEGER, POINTER, DIMENSION(:) :: I_GROUP_RELATION =>NULL()
+     !REAL(EB), POINTER, DIMENSION(:) :: DFAC_GROUP_RELATION =>NULL()
   END TYPE EVACUATION_TYPE
   !
   ! An evacuation hole, i.e., a rectangle where humans should not be put.
@@ -383,7 +389,7 @@ MODULE EVAC
   INTEGER, DIMENSION(:), ALLOCATABLE :: NTT_Evac
   !
   !
-  LOGICAL :: NOT_RANDOM, L_FALLING_MODEL=.FALSE.
+  LOGICAL :: NOT_RANDOM, GROUP_FORCE, L_FALLING_MODEL=.FALSE.
   INTEGER :: I_FRIC_SW, COLOR_METHOD, COLOR_METHOD_TMP, I_AVATAR_COLOR, MAX_HUMANS_DIM, SMOKE_KS_SPEED_FUNCTION, &
              FED_ACTIVITY, I_HERDING_TYPE
   REAL(EB) :: EVAC_MASS_EXTINCTION_COEFF
@@ -392,7 +398,7 @@ MODULE EVAC
        RADIUS_COMPLETE_1, GROUP_EFF, FED_DOOR_CRIT, &
        TDET_SMOKE_DENS, DENS_INIT, EVAC_DT_MAX, GROUP_DENS, &
        FC_DAMPING, EVAC_DT_MIN, V_MAX, V_ANGULAR_MAX, V_ANGULAR, &
-       SMOKE_MIN_SPEED, SMOKE_MIN_SPEED_FACTOR, SMOKE_MIN_SPEED_VISIBILITY, TAU_CHANGE_DOOR, &
+       SMOKE_MIN_SPEED, SMOKE_MIN_SPEED_FACTOR, SMOKE_MIN_SPEED_VISIBILITY, TAU_CHANGE_DOOR, TPRE_TAU, TPRE_TAU_INER, &
        HUMAN_SMOKE_HEIGHT, TAU_CHANGE_V0, THETA_SECTOR, CONST_DF, FAC_DF, &
        CONST_CF, FAC_CF, FAC_1_WALL, FAC_2_WALL, FAC_V0_DIR, FAC_V0_NOCF, FAC_NOCF, &
        CF_MIN_A, CF_FAC_A_WALL, CF_MIN_TAU, CF_MIN_TAU_INER, CF_FAC_TAUS, FAC_DOOR_QUEUE, FAC_DOOR_ALPHA,&
@@ -415,6 +421,17 @@ MODULE EVAC
   INTEGER :: n_dead=0, icyc_old=0, n_change_doors=0, n_change_trials=0
   REAL(EB) :: fed_max_alive, fed_max
   INTEGER, DIMENSION(:,:), ALLOCATABLE :: N_HawkDoveCount
+  
+  !Global Array: Measurement of Social Relationship
+  REAL(EB), DIMENSION(:,:), ALLOCATABLE :: DFACTOR_MATRIX
+  !REAL(EB), DIMENSION(0:NPC_EVAC, 0:NPC_EVAC) :: DFACTOR_MATRIX
+  
+  !Another Choice is Delare the Dimension as Large as Possible
+  !REAL(EB), DIMENSION(0:8, 0:8) :: DFACTOR_MATRIX
+  
+  REAL(EB), DIMENSION(:,:), ALLOCATABLE :: BFACTOR_MATRIX
+  REAL(EB), DIMENSION(:,:), ALLOCATABLE :: AFACTOR_MATRIX
+  
   !
   ! Stairs constants
   INTEGER :: STRS_LANDING_TYPE=1, STRS_STAIR_TYPE=2
@@ -483,9 +500,9 @@ CONTAINS
          WIDTH2, EFF_WIDTH, EFF_LENGTH, FAC_SPEED, TIME_OPEN, TIME_CLOSE
     REAL(EB) :: UBAR0, VBAR0, TIME_DELAY, TRAVEL_TIME
     LOGICAL :: CHECK_FLOW, COUNT_ONLY, AFTER_REACTION_TIME, EXIT_SIGN, KEEP_XY, USE_V0, SHOW, COUNT_DENSITY, GLOBAL
-    LOGICAL :: OUTPUT_SPEED, OUTPUT_MOTIVE_FORCE, OUTPUT_FED, OUTPUT_OMEGA, OUTPUT_DENSITY, OUTPUT_ANGLE, &
+    LOGICAL :: OUTPUT_SPEED, OUTPUT_MOTIVE_FORCE, OUTPUT_FED, OUTPUT_OMEGA, OUTPUT_DENSITY, OUTPUT_ANGLE, OUTPUT_GROUP_FORCE, &
          OUTPUT_CONTACT_FORCE, OUTPUT_TOTAL_FORCE, OUTPUT_MOTIVE_ANGLE, OUTPUT_ACCELERATION, OUTPUT_NERVOUSNESS, &
-         LOCKED_WHEN_CLOSED, TARGET_WHEN_CLOSED, WAIT_AT_XYZ, ELEVATOR, EVAC_FDS6, KNOWN_DOOR
+	 LOCKED_WHEN_CLOSED, TARGET_WHEN_CLOSED, WAIT_AT_XYZ, ELEVATOR, EVAC_FDS6, KNOWN_DOOR
     !Issue1547: Added new output keyword for the PERS namelist, here is the definition
     !Issue1547: of the variable (OUTPUT_NERVOUSNES) that is needed by Fortran.
     INTEGER, DIMENSION(3) :: RGB, AVATAR_RGB
@@ -501,6 +518,13 @@ CONTAINS
 
     CHARACTER(60), DIMENSION(51) :: KNOWN_DOOR_NAMES
     REAL(EB), DIMENSION(51) :: KNOWN_DOOR_PROBS
+    
+    !CHARACTER(60), DIMENSION(51) :: GROUP_NAMES
+    !REAL(EB), DIMENSION(0:51) :: DFACTOR
+    REAL(EB), DIMENSION(0:8) :: DFACTOR
+    REAL(EB), DIMENSION(0:8) :: BFACTOR
+    REAL(EB), DIMENSION(0:8) :: AFACTOR
+    
 
     INTEGER, DIMENSION(:), ALLOCATABLE :: TMP_AVATAR_TYPE_INDEX
     CHARACTER(60), DIMENSION(:), ALLOCATABLE :: TMP_AVATAR_TYPE_NAME, TMP_AVATAR_TYPE_PROP
@@ -539,7 +563,8 @@ CONTAINS
          ID, DTSAM, XB, FLOW_FIELD_ID, PERS_ID, &
          TIME_START, TIME_STOP, IOR, MAX_FLOW, WIDTH, ANGLE, &
          AFTER_REACTION_TIME, GN_MIN, GN_MAX, &
-         KNOWN_DOOR_NAMES, KNOWN_DOOR_PROBS, MESH_ID, &
+         KNOWN_DOOR_NAMES, KNOWN_DOOR_PROBS, DFACTOR, BFACTOR, AFACTOR, &
+	 MESH_ID, &  !GROUP_NAMES
          COLOR_INDEX, EVAC_MESH, RGB, COLOR, &
          AVATAR_COLOR, AVATAR_RGB, SHOW, PRE_EVAC_DIST, DET_EVAC_DIST, &
          PRE_MEAN,PRE_PARA,PRE_PARA2,PRE_LOW,PRE_HIGH, &
@@ -562,15 +587,15 @@ CONTAINS
          FAC_A_WALL, FAC_B_WALL, LAMBDA_WALL, NOISEME, NOISETH, NOISECM, &
          I_FRIC_SW, GROUP_EFF, RADIUS_COMPLETE_0, &
          RADIUS_COMPLETE_1, DEFAULT_PROPERTIES, &
-         NOT_RANDOM, FED_DOOR_CRIT, COLOR_METHOD, &
+         NOT_RANDOM, GROUP_FORCE, FED_DOOR_CRIT, COLOR_METHOD, &
          TDET_SMOKE_DENS, DENS_INIT, EVAC_DT_MAX, EVAC_DT_MIN, &
          D_TORSO_MEAN, D_SHOULDER_MEAN, TAU_ROT, M_INERTIA, &
          FC_DAMPING, V_MAX, V_ANGULAR_MAX, V_ANGULAR, &
          OUTPUT_SPEED, OUTPUT_MOTIVE_FORCE, OUTPUT_FED, OUTPUT_OMEGA, OUTPUT_DENSITY, &
-         OUTPUT_MOTIVE_ANGLE, OUTPUT_ANGLE, OUTPUT_CONTACT_FORCE, OUTPUT_TOTAL_FORCE, &
-         OUTPUT_ACCELERATION, OUTPUT_NERVOUSNESS, COLOR_INDEX, DEAD_RGB, DEAD_COLOR, &
+         OUTPUT_MOTIVE_ANGLE, OUTPUT_ANGLE, OUTPUT_CONTACT_FORCE, OUTPUT_TOTAL_FORCE, OUTPUT_GROUP_FORCE, OUTPUT_ACCELERATION, &
+	 OUTPUT_NERVOUSNESS, COLOR_INDEX, DEAD_RGB, DEAD_COLOR, &
          SMOKE_MIN_SPEED, SMOKE_MIN_SPEED_FACTOR, SMOKE_MIN_SPEED_VISIBILITY, &
-         TAU_CHANGE_DOOR, RGB, COLOR, AVATAR_COLOR, AVATAR_RGB, HUMAN_SMOKE_HEIGHT, &
+         TAU_CHANGE_DOOR, RGB, COLOR, AVATAR_COLOR, AVATAR_RGB, HUMAN_SMOKE_HEIGHT, TPRE_TAU, TPRE_TAU_INER, &
          TAU_CHANGE_V0, THETA_SECTOR, CONST_DF, FAC_DF, CONST_CF, FAC_CF, &
          FAC_1_WALL, FAC_2_WALL, FAC_V0_DIR, FAC_V0_NOCF, FAC_NOCF, &
          CF_MIN_A, CF_FAC_A_WALL, CF_MIN_TAU, CF_MIN_TAU_INER, CF_FAC_TAUS, &
@@ -1319,6 +1344,24 @@ CONTAINS
                CALL ChkMemErr('READ','EVAC_EVACS',IZERO)
                EVAC_EVACS(:)%I_EVAC_THIS_MESH = 1
             END IF
+	    
+	    IF (NPC_EVAC > 0 ) THEN
+	        ALLOCATE(DFACTOR_MATRIX(0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+		CALL ChkMemErr('READ','DFACTOR_MATRIX',IZERO)
+		DFACTOR_MATRIX = 1.0_EB
+	    END IF
+	    
+	    IF (NPC_EVAC > 0 ) THEN
+	        ALLOCATE(BFACTOR_MATRIX(0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+		CALL ChkMemErr('READ','BFACTOR_MATRIX',IZERO)
+		BFACTOR_MATRIX = 1.0_EB
+	    END IF
+	    
+	    IF (NPC_EVAC > 0 ) THEN
+	        ALLOCATE(AFACTOR_MATRIX(0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+		CALL ChkMemErr('READ','AFACTOR_MATRIX',IZERO)
+		AFACTOR_MATRIX = 1.0_EB
+	    END IF
 
             IF (N_HOLES > 0 ) THEN
                ALLOCATE(EVAC_HOLES(N_HOLES),STAT=IZERO)
@@ -1439,6 +1482,7 @@ CONTAINS
       NOISETH     = 0.01_EB
       NOISECM     = 3.0_EB
       NOT_RANDOM  = .FALSE.
+      GROUP_FORCE = .TRUE.
       EVAC_FDS6   = .TRUE.  ! The default and only one, fds5 style is not supported anymore
       I_FRIC_SW   = 1
       V_MAX             = 20.0_EB ! m/s
@@ -1478,6 +1522,10 @@ CONTAINS
       ! c(Ks) = ( 1 + (BETA*Ks)/ALPHA )  [0,1] interval, c(Ks=0)=1, c(Ks=inf)=0
       SMOKE_SPEED_ALPHA = 0.706_EB   ! Lund 2003, report 3126 (Frantzich & Nilsson)
       SMOKE_SPEED_BETA  = -0.057_EB  ! Lund 2003, report 3126 (Frantzich & Nilsson)
+      
+      !Tune mobility of agent in pre-evacuation time period
+      TPRE_TAU = 10.0_EB
+      TPRE_TAU_INER = 1.3_EB
 
       ! Next parameters are for the counterflow (CF)
       ! Evac 2.2.0: Counterflow treatment is the default
@@ -1558,6 +1606,7 @@ CONTAINS
       OUTPUT_CONTACT_FORCE = .FALSE.
       OUTPUT_TOTAL_FORCE   = .FALSE.
       OUTPUT_NERVOUSNESS   = .FALSE.
+      OUTPUT_GROUP_FORCE   = .FALSE.
       !Issue1547: This subroutine reads the PERS namelists. All the namelist entries should
       !Issue1547: have some default values that are used if no value is given in the input.
       !Issue1547: This way you will not have any uninitialized variables in Fortran.
@@ -2116,6 +2165,8 @@ CONTAINS
       IF (OUTPUT_TOTAL_FORCE) EVAC_N_QUANTITIES = EVAC_N_QUANTITIES + 1
       !Issue1547: Add the counter of the special quantities that are stored in the .prt5 files.
       IF (OUTPUT_NERVOUSNESS) EVAC_N_QUANTITIES = EVAC_N_QUANTITIES + 1
+      IF (OUTPUT_GROUP_FORCE) EVAC_N_QUANTITIES = EVAC_N_QUANTITIES + 1
+      IF (OUTPUT_GROUP_FORCE) EVAC_N_QUANTITIES = EVAC_N_QUANTITIES + 1
 
       IF (EVAC_N_QUANTITIES > 0) THEN
          ALLOCATE(EVAC_QUANTITIES_INDEX(EVAC_N_QUANTITIES),STAT=IZERO)
@@ -2167,6 +2218,16 @@ CONTAINS
          !Issue1547: OUTPUT_NERVOUSNES is defined only for this subroutine.
          IF (OUTPUT_NERVOUSNESS) THEN
             EVAC_QUANTITIES_INDEX(n)=250
+            n = n + 1
+         END IF
+	 
+	 IF (OUTPUT_GROUP_FORCE) THEN
+            EVAC_QUANTITIES_INDEX(n)=251
+            n = n + 1
+         END IF
+	 
+	 IF (OUTPUT_GROUP_FORCE) THEN
+            EVAC_QUANTITIES_INDEX(n)=252
             n = n + 1
          END IF
 
@@ -4160,6 +4221,12 @@ CONTAINS
 
          KNOWN_DOOR_NAMES         = 'null'
          KNOWN_DOOR_PROBS         = 1.0_EB
+	 
+	 !GROUP_NAMES  = 'null'
+	 DFACTOR      = 1.0_EB
+	 BFACTOR      = 1.0_EB
+	 AFACTOR      = 1.0_EB
+	 
          AGENT_TYPE               = 2  ! Default is "known door" agent
          PROP_ID                  = 'null'
          CROWBAR_INPUT_FILE = 'null'
@@ -4288,6 +4355,27 @@ CONTAINS
          CALL ChkMemErr('Read_Evac','HPT%I_VENT_FFIELDS',IZERO)
          ALLOCATE(HPT%P_VENT_FFIELDS(0:i),STAT=IZERO)
          CALL ChkMemErr('Read_Evac','HPT%P_VENT_FFIELDS',IZERO)
+	 
+	 
+	 !IF (TRIM(GROUP_NAMES(51)) /= 'null') THEN
+         !   WRITE(MESSAGE,'(A,A,A)') 'ERROR: EVAC line ',TRIM(ID), ' problem with GROUP_NAMES'
+         !   CALL SHUTDOWN(MESSAGE) ; RETURN
+         !END IF
+         !IF (TRIM(GROUP_NAMES(1)) == 'null') THEN
+         !   i = 0 ! no groups given
+         !ELSE
+         !   i = 50 ! group names given
+         !   DO WHILE ( TRIM(GROUP_NAMES(i)) == 'null' .AND. i > 1)
+         !      i = i-1
+         !   END DO
+         !END IF
+         !HPT%N_GROUP_RELATION = i
+         !ALLOCATE(HPT%I_GROUP_RELATION(0:i),STAT=IZERO)
+         !CALL ChkMemErr('Read_Evac','HPT%I_GROUP_RELATION',IZERO)
+         !ALLOCATE(HPT%DFAC_GROUP_RELATION(0:i),STAT=IZERO)
+         !CALL ChkMemErr('Read_Evac','HPT%DFAC_GROUP_RELATION',IZERO)
+	 
+	 
          !
          IF (NUMBER_INITIAL_PERSONS > 0 .AND. RESTART) NUMBER_INITIAL_PERSONS =  0
          !
@@ -4409,6 +4497,29 @@ CONTAINS
             HPT%GRID_NAME  = TRIM(FLOW_FIELD_ID)
          END IF
          !
+	 
+	 IF (NPC_EVAC > 8) THEN
+            WRITE(MESSAGE,'(A,A,A)') 'ERROR: EVAC line', TRIM(ID), ' NPC_EVAC > 8 '
+            CALL SHUTDOWN(MESSAGE) ; RETURN
+         END IF
+	 
+	 DO i = 0, NPC_EVAC
+	    HPT%GROUP_DFACTOR(i) = MAX(1.0_EB, DFACTOR(i))
+	    HPT%GROUP_BFACTOR(i) = BFACTOR(i) !MAX(1.0_EB, BFACTOR(i))
+	    HPT%GROUP_AFACTOR(i) = AFACTOR(i) !MAX(0.0_EB, AFACTOR(i))
+	 END DO
+	 
+	 !DO i = 1, HPT%N_GROUP_RELATION
+	 !   HPT%DFAC_GROUP_RELATION(i) = MAX(1.0_EB,DFACTOR(i))
+	 !   HPT%I_GROUP_RELATION(i) = 0
+	 !   DO j = 1, NPC_EVAC
+         !      IF ( TRIM(EVAC_EVACS(j)%ID) == TRIM(GROUP_NAMES(i)) ) THEN
+         !         HPT%I_GROUP_RELATION(i) = j
+         !      END IF
+         !   END DO
+	 !END DO
+	 
+	 
          DO i = 1, HPT%N_VENT_FFIELDS
             HPT%P_VENT_FFIELDS(i) = MAX(0.0_EB,KNOWN_DOOR_PROBS(i))
             HPT%I_VENT_FFIELDS(i) = 0
@@ -6067,6 +6178,60 @@ CONTAINS
        END DO FED_J_LOOP
     END DO FED_I_LOOP
 
+
+    !ALLOCATE(DFACTOR_MATRIX (0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+    !CALL ChkMemErr('INIT_EVACUATION','DFACTOR_MATRIX', IZERO)
+    !DFACTOR_MATRIX = 1.0_EB
+    
+    !ALLOCATE(BFACTOR_MATRIX (0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+    !CALL ChkMemErr('INIT_EVACUATION','BFACTOR_MATRIX', IZERO)
+    !BFACTOR_MATRIX = 1.0_EB
+    
+    !ALLOCATE(AFACTOR_MATRIX (0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+    !CALL ChkMemErr('INIT_EVACUATION','AFACTOR_MATRIX', IZERO)
+    !AFACTOR_MATRIX = 1.0_EB
+    
+
+    FACTOR_I_LOOP: DO i = 0,NPC_EVAC
+	FACTOR_J_LOOP: DO j = 0, NPC_EVAC
+	    IF (i == 0) THEN
+		DFACTOR_MATRIX(i,j) = 1.0_EB
+		BFACTOR_MATRIX(i,j) = 1.0_EB
+		AFACTOR_MATRIX(i,j) = 1.0_EB
+	    ELSE
+		DFACTOR_MATRIX(i,j) = EVAC_EVACS(i)%GROUP_DFACTOR(j)
+		BFACTOR_MATRIX(i,j) = EVAC_EVACS(i)%GROUP_BFACTOR(j)
+		AFACTOR_MATRIX(i,j) = EVAC_EVACS(i)%GROUP_AFACTOR(j)
+	    END IF
+	END DO  FACTOR_J_LOOP
+    END DO FACTOR_I_LOOP
+    
+    !WRITE(MESSAGE,'(A,I3,A)') 'SHOW DFACTOR_MATRIX', DFACTOR_MATRIX
+    
+    !
+    !Write DFACTOR_MATRIX to the output file
+    !
+    !Write(LU_EVACOUT,FMT='(A)') 'SHOW DFACTOR_MATRIX'
+    !Write(LU_EVACOUT,FMT='(/)') 
+    !Write(LU_EVACOUT,FMT='(F7.3)') ((DFACTOR_MATRIX(i,j), i=0, NPC_EVAC), j=0, NPC_EVAC)
+    
+    Write(LU_EVACOUT,FMT='(A,/)') 'SHOW DFACTOR_MATRIX'
+    Write(LU_EVACOUT,FMT='(F7.3)') DFACTOR_MATRIX
+    
+    Write(LU_EVACOUT,FMT='(A,/)') 'SHOW DFACTOR_MATRIX'    
+    DO i = 0,NPC_EVAC
+	DO j = 0, NPC_EVAC
+	    IF (j == 0) THEN
+		WRITE (LU_EVACOUT, FMT='(/)')
+		WRITE (LU_EVACOUT, FMT='(2X, F7.3)') DFACTOR_MATRIX(i,j)
+	    ELSE
+		WRITE (LU_EVACOUT, FMT='(2X, F7.3)') DFACTOR_MATRIX(i,j)
+		!DFACTOR_MATRIX(i,j) = EVAC_EVACS(i)%GROUP_DFACTOR(j)
+	    END IF
+	END DO
+    END DO
+    
+
     EVAC_CLASS_LOOP: DO IPC=1,NPC_EVAC
        !
        HPT=>EVAC_EVACS(IPC)
@@ -6485,6 +6650,7 @@ CONTAINS
                 ! Is a lonely soul
                 HR%GROUP_ID = -ilh
              END IF
+	     HR%NEW_ID = IPC
              HR%Commitment = 0.0_EB
              HR%SHOW = .TRUE.
 
@@ -7284,7 +7450,8 @@ CONTAINS
     !
     !
     REAL(EB) ::  SCAL_PROD_OVER_RSQR, U_NEW, V_NEW, VMAX_TIMO, COSPHIFAC, &
-         SPEED_MAX, DELTA_MIN, DT_SUM, C_YEFF, LAMBDAW, B_WALL, A_WALL, &
+         DFAC, BFAC, AFAC, &
+	 SPEED_MAX, DELTA_MIN, DT_SUM, C_YEFF, LAMBDAW, B_WALL, A_WALL, &
          T, CONTACT_F, SOCIAL_F, SMOKE_BETA, SMOKE_ALPHA, SMOKE_SPEED_FAC, tmp1, tmp2, CONTACT_FX, CONTACT_FY
     INTEGER :: IIE, JJE, IIO, JJO, III, JJJ, I_EGRID, I_TMP
     REAL(EB) :: X_NOW, Y_NOW, D_HUMANS, D_WALLS, DTSP_NEW, FAC_TIM, DT_GROUP_DOOR, X11, Y11, SPEED, TPRE
@@ -7300,6 +7467,7 @@ CONTAINS
     CHARACTER(LABEL_LENGTH) :: NAME_OLD_FFIELD
     !
     REAL(EB) :: P2P_TORQUE, FC_X, FC_Y, OMEGA_NEW, ANGLE, A1, TC_Z, FC_X1, FC_Y1
+    REAL(EB) :: FCG_X, FCG_Y  !Group Force
     REAL(EB) :: OMEGA_MAX, OMEGA_0, FAC_V0_UP, FAC_V0_DOWN, FAC_V0_HORI, TAU_FAC, SPEED_X, SPEED_Y
     REAL(EB) :: SMOKE_MIN_SPEED_TMP
     REAL(EB), DIMENSION(6) :: Y_TMP, X_TMP, R_TMP, V_TMP, U_TMP
@@ -7315,7 +7483,7 @@ CONTAINS
     INTEGER, DIMENSION(10) :: HERDING_LIST_IHUMAN
     REAL(EB), DIMENSION(10) :: HERDING_LIST_P2PDIST
     INTEGER :: HERDING_LIST_N
-    REAL(EB) :: HERDING_LIST_P2PMAX, R_HERD_HR, DOT_HERD_HR
+    REAL(EB) :: HERDING_LIST_P2PMAX, R_HERD_HR, DOT_HERD_HR, Other_TPRE
     !
     REAL(EB) :: D_HUMANS_MIN, D_WALLS_MIN
     REAL(EB) :: TNOW
@@ -7774,8 +7942,8 @@ CONTAINS
                             END IF
                             IF (P2P_DIST > R_HERD_HR**2) CYCLE Other_Agent_Loop
                             ! If not yet moving phase, do not follow others
-                            IF (J == 0 .AND. T < HR%TPRE+HR%TDET) CYCLE Other_Agent_Loop
-                            IF (J > 0 .AND. T < GROUP_LIST(J)%TPRE + GROUP_LIST(J)%TDOOR) CYCLE Other_Agent_Loop
+                            !IF (J == 0 .AND. T < HR%TPRE+HR%TDET) CYCLE Other_Agent_Loop
+                            !IF (J > 0 .AND. T < GROUP_LIST(J)%TPRE + GROUP_LIST(J)%TDOOR) CYCLE Other_Agent_Loop
                             IF (P2P_DIST <= HERDING_LIST_P2PMAX) THEN
                                ! Dot product used to check if the other agent is walking towards the agent
                                IF (HERDING_LIST_N < 5) THEN
@@ -7805,6 +7973,14 @@ CONTAINS
                             HERDING_LIST_DOORS(ABS(HRE%I_Target)) = HERDING_LIST_DOORS(ABS(HRE%I_Target)) + &
                                  W0_HERDING -((W0_HERDING-WR_HERDING)/R_HERD_HR)*P2P_DIST
                          END DO Other_Agent_Loop_2
+			 
+			 Other_TPRE = 0.0_EB
+			 Other_Agent_Loop_3: DO IE = 1, HERDING_LIST_N
+                            HRE => HUMAN(HERDING_LIST_IHUMAN(IE))
+			    Other_TPRE = Other_TPRE + HRE%TPRE
+			 END DO Other_Agent_Loop_3
+			 Other_TPRE = Other_TPRE/REAL(HERDING_LIST_N)
+			 
                          DO II = 1, N_DOORS+N_EXITS
                             IF (HERDING_LIST_DOORS(II)>0.0_EB) THEN
                                ! Make it symmetrical with respect the doors.
@@ -7827,8 +8003,10 @@ CONTAINS
                             END IF
                          END DO
                          IF (I_TMP /= 0 .AND. HR%I_Door_Mode == 0) THEN
+			 !IF (I_TMP /= 0) THEN
                             ! Found a door using herding algorithm, start to move after one second.
-                            HR%TPRE = DT_GROUP_DOOR
+			    HR%TPRE = 0.5*HR%TPRE + 0.5*Other_TPRE
+                            !HR%TPRE = DT_GROUP_DOOR
                             HR%TDET = MIN(T,HR%TDET)
                          END IF
                          IF (HR%I_DoorAlgo == 4) THEN
@@ -8099,8 +8277,8 @@ CONTAINS
           END IF
 
           IF (T < T_BEGIN .OR. T < TPRE) THEN
-             HR_TAU = MAX(CF_MIN_TAU, 0.1_EB*HR%TAU)
-             HR_TAU_INER = MAX(CF_MIN_TAU_INER, 0.1_EB*HR%TAU_INER)
+             HR_TAU = MAX(TPRE_TAU, CF_MIN_TAU, 0.1_EB*HR%TAU)
+             HR_TAU_INER = MAX(TPRE_TAU_INER, CF_MIN_TAU_INER, 0.1_EB*HR%TAU_INER)
           END IF
 
           ! Counterflow: Increase motivation to go ahead
@@ -8858,8 +9036,8 @@ CONTAINS
              TPRE = HR%TDET ! Member of a group
           END IF
           IF (T < T_BEGIN .OR. T < TPRE) THEN
-             HR_TAU = MAX(CF_MIN_TAU, 0.1_EB*HR%TAU)
-             HR_TAU_INER = MAX(CF_MIN_TAU_INER, 0.1_EB*HR%TAU_INER)
+             HR_TAU = MAX(TPRE_TAU, CF_MIN_TAU, 0.1_EB*HR%TAU)
+             HR_TAU_INER = MAX(TPRE_TAU_INER, CF_MIN_TAU_INER, 0.1_EB*HR%TAU_INER)
           END IF
           ! =======================================================
           ! Speed dependent social force
@@ -9192,6 +9370,9 @@ CONTAINS
              N_SUUNTA_BACK   = 0 ! How many agents "behind"
              N_SUUNTA_BACKCF = 0 ! How many agents "behind" (counterflow)
           END IF CHANGE_V0_RNCF0
+	  
+	  HR%FX_Group = 0.0_EB
+	  HR%FY_Group = 0.0_EB
 
           ! The force loop over the other agents starts here
           P2PLOOP: DO IE = 1, IE_MAX
@@ -9343,6 +9524,10 @@ CONTAINS
              ELSE
                 COSPHIFAC = 1.0_EB
              END IF
+	     
+	     DFAC = DFACTOR_MATRIX(HR%NEW_ID, HRE%NEW_ID)
+	     BFAC = BFACTOR_MATRIX(HR%NEW_ID, HRE%NEW_ID)
+	     AFAC = AFACTOR_MATRIX(HR%NEW_ID, HRE%NEW_ID)
 
              ! Calculate the position and velocities of the shoulder cirles for HRE
              R_TMP(4) = HRE%R_SHOULDER ! Right circle
@@ -9397,6 +9582,37 @@ CONTAINS
                       END IF
                    END DO
                 END DO
+		
+		!!Group force is added. Here I declare a 2D matrix when the number of EVAC lines is determined.  Users may initialize or modify the matrix by using EVAC Namelist, and this matrix characterizes the social relationship of agents.  
+		     
+		!! The total number of groups is NPC_EVAC, then DFACTOR_MATRIX is in dimension of NPC_EVAC*NPC_EVAC.  If agents are grouped, there will be sub-matrix for each group, and the final matrix consists of these sub-matrices for groups.  
+		     
+		!! The boolean variable GROUP_FORCE switches on the group force.  Users can modify this boolean variable by using PERS Namelist.  
+		
+		FCG_X = 0.0_EB
+		FCG_Y = 0.0_EB
+						     
+		IF (GROUP_FORCE) THEN
+		
+		    TIM_DIST = MAX(0.001_EB,SQRT((X_TMP(2)-X_TMP(5))**2 + (Y_TMP(2)-Y_TMP(5))**2))
+		    
+		    FCG_X = (X_TMP(2)-X_TMP(5))*HR_A*AFAC*COSPHIFAC* &
+                           EXP( -(TIM_DIST-( R_TMP(2)+R_TMP(5) )*DFAC)/HR_B/BFAC)/TIM_DIST*(( R_TMP(2)+R_TMP(5) )*DFAC-TIM_DIST)
+			   
+			   !DFAC: DFactor(I, IE)
+			   !I: Index of the current agent (outer loop) 
+			   !IE: Index of the other agent (inner loop)
+			   
+		    FCG_Y = (Y_TMP(2)-Y_TMP(5))*HR_A*AFAC*COSPHIFAC* &
+                           EXP( -(TIM_DIST-( R_TMP(2)+R_TMP(5) )*DFAC)/HR_B/BFAC)/TIM_DIST*(( R_TMP(2)+R_TMP(5) )*DFAC-TIM_DIST)
+		END IF
+		
+		!HR_A_CF
+		!HR_B_CF
+		HR%FX_Group = HR%FX_Group + FCG_X
+		HR%FY_Group = HR%FY_Group + FCG_Y
+		
+		
                 IF (L_HRE_FALLEN_DOWN) THEN ! Maximum force is skin-skin value, i.e., the pre-exp factor
                    EVEL = SQRT(FC_X**2+FC_Y**2)
                    IF (EVEL > HR_A*COSPHIFAC ) THEN
@@ -9404,8 +9620,8 @@ CONTAINS
                       FC_Y = HR_A*COSPHIFAC * FC_Y/EVEL
                    END IF
                 END IF
-                P2P_U = P2P_U + FC_X
-                P2P_V = P2P_V + FC_Y
+                P2P_U = P2P_U + FC_X + FCG_X
+                P2P_V = P2P_V + FC_Y + FCG_Y
                 SOCIAL_F = SOCIAL_F + SQRT(FC_X**2 + FC_Y**2)
                 TC_Z = 0.0_EB
                 ! Calculate the torque due to the social force. use the closest circles.
@@ -10020,7 +10236,7 @@ CONTAINS
           ! Add self-propelling force terms, self-consistent VV
           ! (First time step towards the exit door)
           IF ( T <= TPRE ) THEN
-             HR_TAU = MAX(CF_MIN_TAU, 0.1_EB*HR%TAU)
+             HR_TAU = MAX(TPRE_TAU, CF_MIN_TAU, 0.1_EB*HR%TAU)
              IF ( (T+DTSP_NEW) > TPRE) THEN
                 EVEL = SQRT(UBAR**2 + VBAR**2)
                 IF (EVEL >= TWO_EPSILON_EB) THEN
@@ -14958,6 +15174,10 @@ CONTAINS
                 !Issue1547: Speed_ave is average speed versus v0_i (v_ave/v0_i)
                 !Issue1547: Nervousness = 1 - (v_ave/v0_i)
                 QP(NPP,NN) = REAL(MAX(1.0_EB - HR%Speed_ave,0.0_EB), FB)
+	     CASE(251)  !GROUP_FORCE, agent group force - WIND CHILL INDEX
+                QP(NPP,NN) = REAL(SQRT(HR%FX_Group**2 + HR%FY_Group**2),FB)
+	     CASE(252)  !GROUP_FORCE, agent group force
+                QP(NPP,NN) = REAL(SQRT(HR%FX_Group**2 + HR%FY_Group**2),FB)
              END SELECT
           END DO
 
