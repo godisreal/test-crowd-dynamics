@@ -11,6 +11,7 @@
 !
 !!!!!!!!!!!!!!
 !
+
 MODULE EVAC
   !
   USE PRECISION_PARAMETERS
@@ -66,6 +67,10 @@ MODULE EVAC
      INTEGER, POINTER, DIMENSION(:) :: I_DOOR_NODES =>NULL()
      INTEGER, POINTER, DIMENSION(:) :: I_VENT_FFIELDS =>NULL()
      REAL(EB), POINTER, DIMENSION(:) :: P_VENT_FFIELDS =>NULL()
+     REAL(EB), DIMENSION(0:8) :: GROUP_DFACTOR = 0.0_EB
+     REAL(EB), DIMENSION(0:8) :: GROUP_BFACTOR = 0.0_EB
+     REAL(EB), DIMENSION(0:8) :: GROUP_AFACTOR = 0.0_EB
+     !REAL(EB), POINTER, DIMENSION(:) :: GROUP_RELATION =>NULL()
   END TYPE EVACUATION_TYPE
   !
   ! An evacuation hole, i.e., a rectangle where humans should not be put.
@@ -341,6 +346,8 @@ MODULE EVAC
   !
   !
   LOGICAL :: NOT_RANDOM
+  !LOGICAL :: GROUP_FORCE
+  INTEGER :: GROUP_FORCE
   INTEGER :: I_FRIC_SW, COLOR_METHOD
   REAL(EB) ::  FAC_A_WALL, FAC_B_WALL, LAMBDA_WALL, &
        NOISEME, NOISETH, NOISECM, RADIUS_COMPLETE_0, &
@@ -361,6 +368,16 @@ MODULE EVAC
   REAL(EB), DIMENSION(:), ALLOCATABLE :: FED_max_Door
   LOGICAL, DIMENSION(:), ALLOCATABLE :: Is_Known_Door, Is_Visible_Door
   INTEGER, DIMENSION(:), ALLOCATABLE :: Color_Tmp
+  
+  !Global Array: Measurement of Social Relationship
+  REAL(EB), DIMENSION(:,:), ALLOCATABLE :: DFACTOR_MATRIX
+  !REAL(EB), DIMENSION(0:NPC_EVAC, 0:NPC_EVAC) :: DFACTOR_MATRIX
+  !REAL(EB), DIMENSION(0:8, 0:8) :: DFACTOR_MATRIX
+  !DFACTOR_MATRIX = 1.0_EB
+  
+  REAL(EB), DIMENSION(:,:), ALLOCATABLE :: AFACTOR_MATRIX
+  REAL(EB), DIMENSION(:,:), ALLOCATABLE :: BFACTOR_MATRIX
+  
   !
   INTEGER :: n_dead=0, icyc_old=0, n_change_doors=0, n_change_trials=0
   REAL(EB) :: fed_max_alive, fed_max
@@ -429,6 +446,10 @@ CONTAINS
 
     CHARACTER(30), DIMENSION(51) :: KNOWN_DOOR_NAMES
     REAL(EB), DIMENSION(51) :: KNOWN_DOOR_PROBS
+    
+    REAL(EB), DIMENSION(0:8) :: DFACTOR
+    REAL(EB), DIMENSION(0:8) :: AFACTOR
+    REAL(EB), DIMENSION(0:8) :: BFACTOR
 
     INTEGER :: ii,jj,kk
 
@@ -461,7 +482,8 @@ CONTAINS
          ID, DTSAM, XB, FLOW_FIELD_ID, PERS_ID, &
          TIME_START, TIME_STOP, IOR, MAX_FLOW, WIDTH, ANGLE, &
          AFTER_REACTION_TIME, GN_MIN, GN_MAX, &
-         KNOWN_DOOR_NAMES, KNOWN_DOOR_PROBS, MESH_ID, &
+         KNOWN_DOOR_NAMES, KNOWN_DOOR_PROBS, DFACTOR, AFACTOR, BFACTOR, &
+	 MESH_ID, &
          COLOR_INDEX, EVAC_MESH, RGB, COLOR, &
          AVATAR_COLOR, AVATAR_RGB, SHOW, PRE_EVAC_DIST, DET_EVAC_DIST, &
          PRE_MEAN,PRE_PARA,PRE_PARA2,PRE_LOW,PRE_HIGH, &
@@ -483,7 +505,7 @@ CONTAINS
          FAC_A_WALL, FAC_B_WALL, LAMBDA_WALL, NOISEME, NOISETH, NOISECM, &
          I_FRIC_SW, GROUP_EFF, RADIUS_COMPLETE_0, &
          RADIUS_COMPLETE_1, DEFAULT_PROPERTIES, &
-         NOT_RANDOM, FED_DOOR_CRIT, COLOR_METHOD, &
+         NOT_RANDOM, GROUP_FORCE, FED_DOOR_CRIT, COLOR_METHOD, &
          TDET_SMOKE_DENS, DENS_INIT, EVAC_DT_MAX, EVAC_DT_MIN, &
          D_TORSO_MEAN, D_SHOULDER_MEAN, TAU_ROT, M_INERTIA, &
          FC_DAMPING, V_MAX, V_ANGULAR_MAX, V_ANGULAR, &
@@ -800,6 +822,24 @@ CONTAINS
             CALL ChkMemErr('READ','EVACUATION',IZERO)
          END IF
 
+	 IF (NPC_EVAC > 0 ) THEN
+	    ALLOCATE(DFACTOR_MATRIX(0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+	    CALL ChkMemErr('READ','DFACTOR_MATRIX',IZERO)
+	    DFACTOR_MATRIX = 1.0_EB
+	 END IF
+	    
+	 IF (NPC_EVAC > 0 ) THEN
+	    ALLOCATE(BFACTOR_MATRIX(0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+	    CALL ChkMemErr('READ','BFACTOR_MATRIX',IZERO)
+	    BFACTOR_MATRIX = 1.0_EB
+	 END IF
+	    
+	 IF (NPC_EVAC > 0 ) THEN
+	    ALLOCATE(AFACTOR_MATRIX(0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+	    CALL ChkMemErr('READ','AFACTOR_MATRIX',IZERO)
+	    AFACTOR_MATRIX = 0.0_EB
+	 END IF
+
          IF (n_holes > 0 ) THEN
             ALLOCATE(EVAC_HOLES(N_HOLES),STAT=IZERO)
             CALL ChkMemErr('READ','EVAC_HOLES',IZERO)
@@ -921,6 +961,7 @@ CONTAINS
       NOISETH     = 0.01_EB
       NOISECM     = 3.0_EB
       NOT_RANDOM = .FALSE.
+      GROUP_FORCE = 1
       I_FRIC_SW   = 1
       V_MAX             = 20.0_EB ! m/s
       V_ANGULAR_MAX     = 8.0_EB  ! rps
@@ -3380,6 +3421,11 @@ CONTAINS
          KNOWN_DOOR_NAMES         = 'null'
          KNOWN_DOOR_PROBS         = 1.0_EB
          AGENT_TYPE               = 2  ! Default is "known door" agent
+	 
+	 DFACTOR         	  = 1.0_EB
+	 AFACTOR         	  = 0.0_EB
+	 BFACTOR         	  = 1.0_EB
+	 
          !
          CALL CHECKREAD('EVAC',LU_INPUT,IOS)
          IF (IOS == 1) THEN
@@ -3576,6 +3622,20 @@ CONTAINS
          ELSE
             HPT%GRID_NAME  = TRIM(FLOW_FIELD_ID)
          END IF
+	 
+	 
+	 IF (NPC_EVAC > 8) THEN
+	    WRITE(MESSAGE,'(A,A,A)') 'ERROR: EVAC line', TRIM(ID), ' NPC_EVAC > 8 '
+            CALL SHUTDOWN(MESSAGE) ; RETURN
+	 END IF
+	 
+	 DO i = 0, NPC_EVAC
+	    HPT%GROUP_DFACTOR(i) = MAX(1.0_EB,DFACTOR(i))
+	    HPT%GROUP_BFACTOR(i) = MAX(1.0_EB,BFACTOR(i))
+	    HPT%GROUP_AFACTOR(i) = MAX(0.0_EB,AFACTOR(i))
+	 END DO
+	 
+	 
          !
          DO i = 1, HPT%N_VENT_FFIELDS
             HPT%P_VENT_FFIELDS(i) = MAX(0.0_EB,KNOWN_DOOR_PROBS(i))
@@ -4333,14 +4393,14 @@ CONTAINS
 
     ! Write program info
 
-    WRITE(EVAC_COMPILE_DATE,'(A)') evacrev(INDEX(evacrev,':')+1:LEN_TRIM(evacrev)-2)
-    READ (EVAC_COMPILE_DATE,'(I5)') EVAC_MODULE_REV
-    WRITE(EVAC_COMPILE_DATE,'(A)') evacdate
-    CALL GET_REV_EVAC(EVAC_MODULE_REV,EVAC_COMPILE_DATE)
+    !WRITE(EVAC_COMPILE_DATE,'(A)') evacrev(INDEX(evacrev,':')+1:LEN_TRIM(evacrev)-2)
+    !READ (EVAC_COMPILE_DATE,'(I5)') EVAC_MODULE_REV
+    !WRITE(EVAC_COMPILE_DATE,'(A)') evacdate
+    !CALL GET_REV_EVAC(EVAC_MODULE_REV,EVAC_COMPILE_DATE)
     !
     WRITE(LU_EVACOUT,'(/A)')          ' FDS+Evac Evacuation Module'
-    WRITE(LU_EVACOUT,'(/A,A)')        ' FDS+Evac Compilation Date: ', &
-         TRIM(EVAC_COMPILE_DATE(INDEX(EVAC_COMPILE_DATE,'(')+1:INDEX(EVAC_COMPILE_DATE,')')-1))
+    !WRITE(LU_EVACOUT,'(/A,A)')        ' FDS+Evac Compilation Date: ', &
+    !     TRIM(EVAC_COMPILE_DATE(INDEX(EVAC_COMPILE_DATE,'(')+1:INDEX(EVAC_COMPILE_DATE,')')-1))
     WRITE(LU_EVACOUT,'(A,A)')  ' FDS+Evac Version         : ', TRIM(EVAC_VERSION)
     WRITE(LU_EVACOUT,'(A,i0)')  ' FDS+Evac SVN Revision No.: ', EVAC_MODULE_REV
 
@@ -5165,6 +5225,41 @@ CONTAINS
        END DO FED_J_LOOP
     END DO FED_I_LOOP
 
+
+    !ALLOCATE(DFACTOR_MATRIX (0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+    !CALL ChkMemErr('INIT_EVACUATION','DFACTOR_MATRIX',IZERO)
+    !DFACTOR_MATRIX = 1.0_EB
+       
+    !ALLOCATE(BFACTOR_MATRIX (0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+    !CALL ChkMemErr('INIT_EVACUATION','BFACTOR_MATRIX',IZERO)
+    !BFACTOR_MATRIX = 1.0_EB
+    
+    !ALLOCATE(AFACTOR_MATRIX (0:NPC_EVAC, 0:NPC_EVAC), STAT=IZERO)
+    !CALL ChkMemErr('INIT_EVACUATION','AFACTOR_MATRIX',IZERO)
+    !AFACTOR_MATRIX = 0.0_EB
+    
+    
+    FACTOR_I_LOOP: DO i = 0,NPC_EVAC
+	FACTOR_J_LOOP: DO j = 0, NPC_EVAC
+	    IF (i == 0) THEN
+		DFACTOR_MATRIX(i,j) = 1.0_EB
+		BFACTOR_MATRIX(i,j) = 1.0_EB
+		AFACTOR_MATRIX(i,j) = 1.0_EB
+	    ELSE
+		DFACTOR_MATRIX(i,j) = EVACUATION(i)%GROUP_DFACTOR(j) !1.0_EB
+		BFACTOR_MATRIX(i,j) = EVACUATION(i)%GROUP_BFACTOR(j) !1.0_EB
+		AFACTOR_MATRIX(i,j) = EVACUATION(i)%GROUP_AFACTOR(j) !0.0_EB
+	    END IF
+	END DO  FACTOR_J_LOOP
+    END DO FACTOR_I_LOOP
+    
+    !DFACTOR_MATRIX = 1.0_EB
+    
+    !WRITE(MESSAGE,'(A,I3,A)') 'SHOW DFACTOR_MATRIX', DFACTOR_MATRIX
+    !WRITE(MESSAGE,'(A,I3,A)') 'SHOW BFACTOR_MATRIX', BFACTOR_MATRIX
+    !WRITE(MESSAGE,'(A,I3,A)') 'SHOW AFACTOR_MATRIX', AFACTOR_MATRIX
+    
+
     EVAC_CLASS_LOOP: DO IPC=1,NPC_EVAC
        !
        HPT=>EVACUATION(IPC)
@@ -5448,6 +5543,7 @@ CONTAINS
                 ! Is a lonely soul
                 HR%GROUP_ID = -ilh
              END IF
+	     HR%NEW_ID = IPC
              HR%Commitment = 0.0_EB
              HR%SHOW = .TRUE.    
 
@@ -6282,7 +6378,8 @@ CONTAINS
     !
     !
     REAL(EB) ::  SCAL_PROD_OVER_RSQR, U_NEW, V_NEW, VMAX_TIMO, COSPHIFAC, &
-         SPEED_MAX, DELTA_MIN, DT_SUM, C_YEFF, LAMBDAW, B_WALL, A_WALL, &
+         DFAC, BFAC, AFAC, SPEED_MAX, DELTA_MIN, DT_SUM, C_YEFF, LAMBDAW, &
+	 B_WALL, A_WALL, &
          T, CONTACT_F, SOCIAL_F, SMOKE_BETA, SMOKE_ALPHA, SMOKE_SPEED_FAC, tmp1, tmp2
     INTEGER :: IIE, JJE, IIO, JJO, III, JJJ, I_EGRID, I_TMP
     REAL(EB) :: X_NOW, Y_NOW, D_HUMANS, D_WALLS, DTSP_NEW, FAC_TIM, DT_GROUP_DOOR, X11, Y11, SPEED, TPRE
@@ -6297,6 +6394,7 @@ CONTAINS
     CHARACTER(30) :: NAME_OLD_FFIELD
     !
     REAL(EB) :: P2P_TORQUE, FC_X, FC_Y, OMEGA_NEW, ANGLE, A1, TC_Z, FC_X1, FC_Y1
+    REAL(EB) :: FCG_X, FCG_Y 
     REAL(EB) :: OMEGA_MAX, OMEGA_0, FAC_V0_UP, FAC_V0_DOWN, FAC_V0_HORI, TAU_FAC, SPEED_X, SPEED_Y
     REAL(EB), DIMENSION(6) :: Y_TMP, X_TMP, R_TMP, V_TMP, U_TMP
     !
@@ -7823,6 +7921,10 @@ CONTAINS
              ELSE
                 COSPHIFAC = 1.0_EB
              END IF
+	     
+	     DFAC = DFACTOR_MATRIX(HR%NEW_ID, HRE%NEW_ID)  !1.0_EB
+	     BFAC = BFACTOR_MATRIX(HR%NEW_ID, HRE%NEW_ID)  !1.0_EB
+	     AFAC = AFACTOR_MATRIX(HR%NEW_ID, HRE%NEW_ID)  !0.0_EB
 
              ! Calculate the position and velocities of the shoulder cirles for HRE
              R_TMP(4) = HRE%R_SHOULDER ! Right circle
@@ -7865,9 +7967,88 @@ CONTAINS
                       END IF
                    END DO
                 END DO
-                P2P_U = P2P_U + FC_X
-                P2P_V = P2P_V + FC_Y
+		
+		
+		!!Group force is added. Here I need to declare a 2D matrix when the number of EVAC lines is determined.  Users may initialize or modify the matrix by using EVAC Namelist, and this matrix characterizes the social relationship of agents.  
+				
+		!! The total number of groups is NPC_EVAC, then DFACTOR_MATRIX is in dimension of NPC_EVAC*NPC_EVAC.  If agents are grouped, there will be sub-matrix for each group, and the final matrix consists of these sub-matrices for groups.  
+		     
+		!! The integer variable GROUP_FORCE switches on the group force.  Users can modify this boolean variable by using PERS Namelist. 
+		!GROUP_FORCE == 0: Traditional Social Force
+		!GROUP_FORCE == 1: Desired Distance - Repulsive Force - Max
+		!GROUP_FORCE == 2: Desired Distance - Repulsive Force - No Max
+		!GROUP_FORCE == 3: Group Force - Repusion or Cohesion
+		
+		
+		IF (GROUP_FORCE == 1) THEN
+		    FC_X = 0.0_EB
+		    FC_Y = 0.0_EB
+		    ! Use the closest circles to calculate the psychological force
+		    DO III = 1, 3
+			DO JJJ = 4, 6
+			TIM_DIST = SQRT((X_TMP(III)-X_TMP(JJJ))**2 + (Y_TMP(III)-Y_TMP(JJJ))**2)
+			! Next is |vector1|*|vector2|
+			EVEL = SQRT((X_TMP(JJJ)-X_TMP(III))**2+(Y_TMP(JJJ)-Y_TMP(III))**2)* SQRT(U_TMP(III)**2+V_TMP(III)**2)
+			IF (EVEL > 0.0_EB) EVEL = ((X_TMP(JJJ)-X_TMP(III))*U_TMP(III) + &
+                           (Y_TMP(JJJ)-Y_TMP(III))*V_TMP(III)) / EVEL   ! COS THETA (SCAL_PROD/(LENGHT1*LENGTH2)
+			IF (EVEL > 0.01_EB) THEN
+                         D_HUMANS = MIN( (TIM_DIST-(R_TMP(III)+R_TMP(JJJ))) /EVEL, D_HUMANS)
+			ELSE
+                         D_HUMANS = MIN( (TIM_DIST-(R_TMP(III)+R_TMP(JJJ))) /0.01_EB , D_HUMANS)
+			END IF
+
+			FC_X1 = (X_TMP(III)-X_TMP(JJJ))*HR_A*COSPHIFAC* &
+                           EXP( -(TIM_DIST-( R_TMP(III)+R_TMP(JJJ) )*DFAC)/HR_B )/TIM_DIST 
+			FC_Y1 = (Y_TMP(III)-Y_TMP(JJJ))*HR_A*COSPHIFAC* &
+                           EXP( -(TIM_DIST-( R_TMP(III)+R_TMP(JJJ) )*DFAC)/HR_B )/TIM_DIST 
+			IF ( (FC_X1**2+FC_Y1**2) > (FC_X**2+FC_Y**2) ) THEN
+			    FC_X = FC_X1
+			    FC_Y = FC_Y1
+			END IF
+		    END DO
+		END DO
+		END IF
+		
+		
+		IF (GROUP_FORCE == 2) THEN
+		
+		    TIM_DIST = MAX(0.001_EB,SQRT((X_TMP(2)-X_TMP(5))**2 + (Y_TMP(2)-Y_TMP(5))**2))
+		    
+		    FC_X = (X_TMP(2)-X_TMP(5))*HR_A*AFAC*COSPHIFAC* &
+                           EXP( -(TIM_DIST-( R_TMP(2)+R_TMP(5))*DFAC)/HR_B/BFAC)/TIM_DIST
+			   
+		    FC_Y = (Y_TMP(2)-Y_TMP(5))*HR_A*AFAC*COSPHIFAC* &
+                           EXP( -(TIM_DIST-( R_TMP(2)+R_TMP(5) )*DFAC)/HR_B/BFAC)/TIM_DIST
+		END IF
+		
+		
+		FCG_X = 0.0_EB
+		FCG_Y = 0.0_EB
+				     
+		IF (GROUP_FORCE == 3) THEN
+		
+		    TIM_DIST = MAX(0.001_EB,SQRT((X_TMP(2)-X_TMP(5))**2 + (Y_TMP(2)-Y_TMP(5))**2))
+		    
+		    FCG_X = (X_TMP(2)-X_TMP(5))*HR_A*AFAC*COSPHIFAC* &
+                           EXP( -(TIM_DIST-( R_TMP(2)+R_TMP(5))*DFAC)/HR_B/BFAC)/TIM_DIST*(( R_TMP(2)+R_TMP(5))*DFAC-TIM_DIST)
+			   
+			   !DFAC: DFactor(I, IE)
+			   !I: Index of the current agent (outer loop) 
+			   !IE: Index of the other agent (inner loop)
+			   
+		    FCG_Y = (Y_TMP(2)-Y_TMP(5))*HR_A*AFAC*COSPHIFAC* &
+                           EXP( -(TIM_DIST-( R_TMP(2)+R_TMP(5) )*DFAC)/HR_B/BFAC)/TIM_DIST*(( R_TMP(2)+R_TMP(5) )*DFAC-TIM_DIST)
+		END IF
+		
+		!HR_A_CF
+		!HR_B_CF
+		
+		
+                P2P_U = P2P_U + FC_X + FCG_X
+                P2P_V = P2P_V + FC_Y + FCG_Y
                 SOCIAL_F = SOCIAL_F + SQRT(FC_X**2 + FC_Y**2)
+		
+		
                 TC_Z = 0.0_EB
                 ! Calculate the torque due to the social force. use the closest circles.
                 DO JJJ = 4, 6
