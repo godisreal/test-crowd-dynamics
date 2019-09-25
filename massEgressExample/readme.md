@@ -7,5 +7,5 @@ http://eil.stanford.edu/egress/
 In the original work by Dr. Xiaoshan Pan, there is no fire and smoke simulation.  
 We use FDS+EVAC to releaize a new version of simulation with fire and smoke.  
 
-
+![](https://github.com/godisreal/test-group-dynamics/blob/master/img/Ex2018Test-SmokeFED_0036.png)
 
