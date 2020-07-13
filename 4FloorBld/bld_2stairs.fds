@@ -1,0 +1,359 @@
+&HEAD CHID='bld_wpr_3', TITLE='BEKOK-C_LAYOUT'/
+
+&MESH IJK=87,50,57,XB=0.0,61.5,0.0,36.0,5.5,9.7 / 
+
+&MESH IJK=87,50,57,XB=13.5,30.9, 2.1,32.1,10.0,15.4 / 174,100,114
+
+&MESH IJK=87,50,57,XB=13.5,30.9, 2.1,32.1,15.6,20.74 / 
+
+&MESH IJK=87,50,57,XB=13.5,30.9, 2.1,32.1,20.9,23.0/ Not Use 4th Floor
+
+********EVACUATION MESH************
+ MESH IJK=87,50,1,XB=0.0,61,0.0,36.0, 5.4,7.0, EVAC_Z_OFFSET=1.0,
+      EVACUATION=.TRUE., EVAC_HUMANS=.TRUE., ID='1stfloorgrid'/
+
+ Now dx=dy=0.3m, z_mid=6.2m
+&MESH IJK=205,120,1,XB=0.0,61.5,0.0,36.0, 5.4,7.0, EVAC_Z_OFFSET=1.0,
+      EVACUATION=.TRUE., EVAC_HUMANS=.TRUE., ID='1stfloorgrid'/
+ MESH IJK=205,120,1,XB=0.0,61.5,0.0,36.0, 5.4,7.0,
+      EVACUATION=.TRUE., EVAC_HUMANS=.FALSE., ID='GroundExit1'/
+&SLCF PBZ=6.0, QUANTITY='VELOCITY', VECTOR=.TRUE., EVACUATION=.TRUE. /
+
+ dx=dy=0.3m, z_mid=10.6
+&MESH IJK=59,100,1,XB=13.2,53.6, 2.1,32.1, 9.8,11.4, EVAC_Z_OFFSET=1.0,
+      EVACUATION=.TRUE., EVAC_HUMANS=.TRUE., ID='2ndfloorgrid'/
+&SLCF PBZ=10.5, QUANTITY='VELOCITY', VECTOR=.TRUE., EVACUATION=.TRUE. /
+MESH IJK=59,100,1,XB=13.2,30.9, 2.1,32.1, 9.8,11.4,
+      EVACUATION=.TRUE., EVAC_HUMANS=.FALSE., ID='2ndlevelExit2'/  
+
+dx=dy=0.3m, z_mid=16.1195
+&MESH IJK=59,100,1,XB=13.2,30.9, 2.1,32.1, 15.439,16.8, EVAC_Z_OFFSET=1.0,
+      EVACUATION=.TRUE., EVAC_HUMANS=.TRUE., ID='3rdfloorgrid'/
+&SLCF PBZ=16.1, QUANTITY='VELOCITY', VECTOR=.TRUE., EVACUATION=.TRUE. /
+MESH IJK=59,100,1,XB=13.2,30.9, 2.1,32.1, 15.439,16.8,
+      EVACUATION=.TRUE., EVAC_HUMANS=.FALSE., ID='3rdlevelExit'/
+
+
+====Not Use 4th FLOOR=====
+
+dx=dy=0.3m, z_mid=21.3815
+&MESH IJK=59,100,1,XB=13.2,30.9, 2.1,32.1, 20.763,22.0, EVAC_Z_OFFSET=1.0,
+      EVACUATION=.TRUE., EVAC_HUMANS=.TRUE., ID='4thfloorgrid'/
+&SLCF PBZ=16.1, QUANTITY='VELOCITY', VECTOR=.TRUE., EVACUATION=.TRUE. /
+MESH IJK=59,100,1,XB=13.2,30.9, 2.1,32.1, 20.763,22.0,
+      EVACUATION=.TRUE., EVAC_HUMANS=.FALSE., ID='4thlevelExit'/
+===========================
+
+
+ STRS ID='staircase',
+      XB= 10.5,13.2,  3.3,12.9, 5.4,22.0,
+
+ Add walls to your staircase. (for the other meshes, that their agents
+ can not enter the strs-mesh accidentally. They should used doors to
+ change the mesh to strs-mesh.
+&OBST XB=10.48,10.5, 3.3,12.9, 0.4,24.0, COLOR='RED', EVACUATION=.TRUE. /
+&OBST XB=13.2,13.22, 3.3,12.9, 0.4,24.0, COLOR='RED', EVACUATION=.TRUE. /
+&OBST XB=10.5,13.2,  3.28,3.3, 0.4,24.0, COLOR='RED', EVACUATION=.TRUE. /
+&OBST XB=10.5,13.2,  12.9,12.92, 0.4,24.0, COLOR='RED', EVACUATION=.TRUE. /
+
+ dx=dy=0.1m
+MESH IJK=27,96,1,,XB=10.5,13.2,  3.3,12.9, 5.4,22.0, EVAC_Z_OFFSET=0.9,
+      EVACUATION=.TRUE., EVAC_HUMANS=.TRUE., ID='staircase'/
+
+
+MESH IJK=87,50,1,XB=10.5,13.484,3.4,12.839,6.5,22.0, EVAC_Z_OFFSET=1.0,
+      EVACUATION=.TRUE., EVAC_HUMANS=.TRUE., ID='staircase'/
+
+*************************************
+&MISC EVACUATION_MC_MODE=.TRUE., EVACUATION_DRILL=.TRUE. /
+*************************************
+~&SURF ID='Outflow.',
+      RGB=26,128,26,
+      VEL=1.0E-6,
+      TAU_V=0.1/
+************************************
+
+
+************************************
+&DUMP RENDER_FILE='OFFSHORE.ge1', DT_RESTART=300.0/
+************************************
+
+&TIME T_END=200./
+
+&REAC ID='GASOLINE',C=8.,H=18.,SOOT_YIELD=0.03/
+
+
+&MATL ID='CONCRETE_STONE'
+CONDUCTIVITY=1.7
+SPECIFIC_HEAT=0.88
+DENSITY=2400./
+
+&MATL ID='STAINLESS_STEEL'
+CONDUCTIVITY=16.2
+SPECIFIC_HEAT=0.502
+DENSITY=7750./
+
+&MATL ID ='BUILDING'
+CONDUCTIVITY =0.07
+SPECIFIC_HEAT=2.1
+DENSITY=230./
+
+&SURF ID	='WALLS'
+	MATL_ID='BUILDING'
+	COLOR='SEPIA'
+	BACKING='VOID'
+	THICKNESS=0.010/
+
+&SURF ID='GROUND_BASE'
+MATL_ID='CONCRETE_STONE'
+COLOR='SANDY BROWN'
+BACKING='VOID'
+THICKNESS=5/    * Difference between thickness and z direction values 
+
+&SURF ID='EQUIPMENT'
+MATL_ID='STAINLESS_STEEL'
+COLOR='SILVER'
+BACKING='VOID'
+THICKNESS=0.05/
+
+
+&SURF ID='BURNER1',HRRPUA=1700./ Gas burner 
+
+
+
+
+&OBST XB=4.380,11.193,3.4069,31.31137,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+&OBST XB=2.5957,4.54205,3.4069,29.201,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+&OBST XB=0.0,2.5957,4.380,5.3537,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+&OBST XB=0.0,2.5957,13.468,14.438,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+&OBST XB=0.0,2.5957,22.712,23.686,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+&OBST XB=1.379,2.5957,9.004,9.896,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+&OBST XB=1.379,2.5957,18.170,19.143,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+&OBST XB=1.1216,2.5957,27.254,19.201,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+&OBST XB=11.193,20.927,1.135,33.902,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+&OBST XB=11.193,12.977,0.324,1.135,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+&OBST XB=20.927,29.849,1.135,33.902,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+&OBST XB=29.849,53.234,3.569,31.711,2.5,5.0, SURF_ID='GROUND_BASE'/ First Deck Ground-Floor
+
+
+
+=================================================
+============= EVAC GEOMETRY STARTS ==================
+=================================================
+
+		======== FIRST FLOOR EVACUATION =========
+
+&PERS ID='person', DEFAULT_PROPERTIES='Adult',
+      PRE_EVAC_DIST=0, PRE_MEAN=0.5, VELOCITY_DIST=1,
+      VEL_LOW=0.95,VEL_HIGH=1.55,
+      COLOR_METHOD=0 / color using evac-line colors
+
+~&VENT SURF_ID='Outflow.', XB=5.1,7.0,4.2,4.2,5.0,7.0,
+      EVACUATION=.TRUE.,MESH_ID='1stfloorgrid'/ Exit Vent.
+
+~&VENT SURF_ID='Outflow.', XB=5.1,7.0,4.2,4.2,5.0,7.0,
+      EVACUATION=.TRUE.,MESH_ID='GroundExit1'/ Exit Vent.
+
+	  
+&EXIT ID='GroundExit1', FYI='staircase', XB=5.1,7.0,0.2,0.2,5.4,7.0, IOR=-2,
+      MESH_ID='1stfloorgrid'/
+OBST SURF_ID='INERT', XB=5.1,7.0,4.0,4.2,5.0,7.0, THICKEN=.TRUE./ Exit Vent
+
+&EXIT ID='GroundExit2', FYI='staircase', XB=5.1,7.0,35.2,35.2,5.4,7.0, IOR=+2,
+      MESH_ID='1stfloorgrid'/
+	  
+&EXIT ID='GroundExit3', FYI='staircase', XB=53.1,55.0,35.2,35.2,5.4,7.0, IOR=+2,
+      MESH_ID='1stfloorgrid'/
+
+**************************************************************
+******************* Staircase Core & STRS *******************
+ Create the staircase core
+
+OBST XB= 11.5,12.2,  4.5,11.7, 4.0,20.0, COLOR='RED', EVACUATION=.TRUE.,
+      PERMIT_HOLE=.FALSE., MESH_ID='staircase' /
+
+HOLE XB= 10.5,13.2,  3.3,12.9, 5.4,11.4, EVACUATION=.TRUE.,
+      MESH_ID='staircase' /
+
+ HOLE XB= 10.49,13.47,3.39,12.84,5.4,20.0, EVACUATION=.TRUE., /
+
+ *STRS parameters*
+StrsMESH IJK=27,96,1,,XB=10.5,13.2,  3.3,12.9, 5.4,11.4,
+
+
+
+~&VENT SURF_ID='Outflow.', XB=13.2,13.2, 3.3,4.5, 10.6,10.6,
+      EVACUATION=.TRUE.,MESH_ID='2ndfloorgrid'/ Exit Vent.
+~&VENT SURF_ID='Outflow.', XB=13.2,13.2, 3.3,4.5, 10.6,10.6,
+      EVACUATION=.TRUE.,MESH_ID='2ndlevelExit2 '/ Exit Vent.
+
+~&VENT SURF_ID='Outflow.', XB=13.2,13.2, 3.3,4.5, 16.1195,16.1195,
+      EVACUATION=.TRUE.,MESH_ID='3rdfloorgrid'/ Exit Vent.
+~&VENT SURF_ID='Outflow.', XB=13.2,13.2, 3.3,4.5, 16.1195,16.1195,
+      EVACUATION=.TRUE.,MESH_ID='3rdlevelExit'/ Exit Vent.
+
+~&VENT SURF_ID='Outflow.', XB=13.2,13.2, 3.3,4.5, 21.3815,21.3815,
+      EVACUATION=.TRUE.,MESH_ID='4thfloorgrid'/ Exit Vent.
+~&VENT SURF_ID='Outflow.', XB=13.2,13.2, 3.3,4.5, 21.3815,21.3815,
+      EVACUATION=.TRUE.,MESH_ID='4thlevelExit'/ Exit Vent.
+ 
+z_mid=10.6
+&DOOR ID='exit2', FYI='staircase', XB=13.2,13.2, 3.3,4.5, 10.6,10.6, IOR=-1, MESH_ID='2ndfloorgrid',EXIT_SIGN=.TRUE.,TO_NODE='staircase', KEEP_XY=.FALSE./  
+
+
+z_mid=16.1195
+&DOOR ID='exit3', FYI='staircase', XB=13.2,13.2, 3.3,4.5, 16.1195,16.1195, IOR=-1, MESH_ID='3rdfloorgrid', EXIT_SIGN=.TRUE.,TO_NODE='staircase', KEEP_XY=.FALSE./ 
+
+z_mid=21.3815
+&DOOR ID='exit4', FYI='staircase', XB=13.2,13.2, 3.3,4.5, 21.3815,21.3815, IOR=-1, MESH_ID='4thfloorgrid', EXIT_SIGN=.TRUE.,TO_NODE='staircase', KEEP_XY=.FALSE./
+
+
+ This door is for staircase => 1st floor transition
+ No need for any vents, nobody is heading towards this door at the
+ ground floor. No need for a vent in the strs-mesh, there the flows
+ are not calculated by the "outflow" trick, the directions are trivial
+ inside a staircase (up or down...).
+
+&DOOR ID='StairsMainExit', FYI='staircase', XB=10.5,11.7, 3.3,3.3,6.1,6.2, 
+      IOR=+2, MESH_ID='1stfloorgrid', EXIT_SIGN=.FALSE.,TO_NODE='staircase'/
+
+STRS ID='Strs2',
+      XB= 10.5,13.2,  3.3,12.9, 5.4,22.0,
+      XB_CORE= 11.5,12.2,  4.5,11.7,
+      RIGHT_HANDED=.FALSE., MESH_ID='staircase',
+      VERTICAL_LANDING_SEPARATION=2.2,  N_LANDINGS=7,
+      XB_LANDINGS( 1,:)= 10.5,13.2,   3.3, 4.5,   6.0, 6.2,
+      XB_LANDINGS( 2,:)= 10.5,13.2,  11.7,12.9,   8.2, 8.4,
+      XB_LANDINGS( 3,:)= 10.5,13.2,  3.3, 4.5,   13.9195,13.9195,
+      XB_LANDINGS( 4,:)= 10.5,13.2,  11.7,12.9,   21.1815,21.3815,
+      FAC_V0_UP=0.4, FAC_V0_DOWN=0.60, FAC_V0_HORI=1.0, /
+
+OBST XB= 13.2,13.6,  3.3,12.9, 5.4,7.0, COLOR='RED', EVACUATION=.TRUE.,
+      PERMIT_HOLE=.FALSE., MESH_ID='staircase' /
+
+OBST XB= 10.2,10.5,  3.3,12.9, 5.4,7.0, COLOR='RED', EVACUATION=.TRUE.,
+      PERMIT_HOLE=.FALSE., MESH_ID='staircase' /
+
+	  
+MESH IJK=205,120,1,XB=0.0,61.5,0.0,36.0, 5.4,7.0, 	/FL1
+MESH IJK=59,100,1,XB=13.2,53.6, 2.1,32.1, 9.8,11.4,	/FL2
+MESH IJK=59,100,1,XB=13.2,30.9, 2.1,32.1, 15.439,16.8,	/FL3
+MESH IJK=59,100,1,XB=13.2,30.9, 2.1,32.1, 20.763,22.0, 	/FL4
+
+&STRS ID='staircase',
+      XB= 10.5,13.2,  3.3,12.9, 5.4,22.0,
+      XB_CORE= 11.5,12.2,  4.5,11.7,
+      RIGHT_HANDED=.FALSE., 
+      VERTICAL_LANDING_SEPARATION=2.55,  N_LANDINGS=7,
+      XB_LANDINGS( 1,:)= 10.5,13.2,   3.3, 4.5,   6.1, 6.3,
+      XB_LANDINGS( 2,:)= 10.5,13.2,  11.7,12.9,   8.3, 8.5,
+      XB_LANDINGS( 3,:)= 10.5,13.2,   3.3, 4.5,  10.5,10.7,
+      XB_LANDINGS( 4,:)= 10.5,13.2,  11.7,12.9,  13.20975,13.40975,
+      XB_LANDINGS( 5,:)= 10.5,13.2,   3.3, 4.5,   16.0195,16.2195,
+      XB_LANDINGS( 6,:)= 10.5,13.2,  11.7,12.9,   18.6505,18.8505,
+      XB_LANDINGS( 7,:)= 10.5,13.2,   3.3, 4.5,   21.2815,21.4815,
+      FAC_V0_UP=0.4, FAC_V0_DOWN=0.60, FAC_V0_HORI=1.0, /
+
+*************************************************************
+
+z_mid=10.6
+&DOOR ID='exit2R', FYI='staircase2', XB=53.6,53.6, 3.3,4.5, 10.6,10.6, IOR=+1, MESH_ID='2ndfloorgrid',EXIT_SIGN=.TRUE.,TO_NODE='staircase2', KEEP_XY=.FALSE./ 
+
+&STRS ID='staircase2',
+      XB= 53.6,56.3,  3.3,12.9, 5.4,11.4,
+      XB_CORE= 54.6,55.3,  4.5,11.7,
+      RIGHT_HANDED=.FALSE., 
+      VERTICAL_LANDING_SEPARATION=2.55,  N_LANDINGS=3,
+      XB_LANDINGS( 1,:)= 53.6,56.3,   3.3, 4.5,   6.1, 6.3,
+      XB_LANDINGS( 2,:)= 53.6,56.3,  11.7,12.9,   8.3, 8.5,
+      XB_LANDINGS( 3,:)= 53.6,56.3,   3.3, 4.5,  10.5,10.7,
+      FAC_V0_UP=0.4, FAC_V0_DOWN=0.60, FAC_V0_HORI=1.0, /
+
+	  
+&DOOR ID='StairsMainExit2', FYI='staircase2', XB=53.6,54.8, 3.3,3.3,6.1,6.2, 
+      IOR=+2, MESH_ID='1stfloorgrid', EXIT_SIGN=.FALSE.,TO_NODE='staircase2'/
+
+ Add walls to your staircase. (for the other meshes, that their agents
+ can not enter the strs-mesh accidentally. They should used doors to
+ change the mesh to strs-mesh.
+&OBST XB=53.58,53.6, 3.3,12.9, 0.4,13.0, COLOR='RED', EVACUATION=.TRUE. /
+&OBST XB=56.3,56.32, 3.3,12.9, 0.4,13.0, COLOR='RED', EVACUATION=.TRUE. /
+&OBST XB=53.6,56.3,  3.28,3.3, 0.4,13.0, COLOR='RED', EVACUATION=.TRUE. /
+&OBST XB=53.6,56.3,  12.9,12.92, 0.4,13.0, COLOR='RED', EVACUATION=.TRUE. /	  
+	  
+
+&EVAC ID='operationteam1', XB=5.1,9.6,4.5,10.0,5.4,7.0, AVATAR_COLOR='RED',
+      COLOR='RED',
+      NUMBER_INITIAL_PERSONS=10, PERS_ID='person', MESH_ID='1stfloorgrid'/
+
+&EVAC ID='operationteam2', XB=9.5,25.0,12.5,25.4,5.4,7.0,
+      NUMBER_INITIAL_PERSONS=30, PERS_ID='person', MESH_ID='1stfloorgrid'/
+
+&EVAC ID='operationteam3', XB=26.0,46.0,5.5,26.0,5.4,7.0,
+     NUMBER_INITIAL_PERSONS=80, PERS_ID='person', MESH_ID='1stfloorgrid'/
+
+
+		======== SECOND FLOOR EVACUATION =========
+
+&PERS ID='person02', DEFAULT_PROPERTIES='Adult', PRE_EVAC_DIST=0,
+     PRE_MEAN=0.5, VELOCITY_DIST=1, VEL_LOW=0.95, VEL_HIGH=1.19/
+
+
+&EVAC ID='operationteam21', XB=16.0,47.0,3.5,29.0,9.8,11.4, COLOR='BLUE',
+      AVATAR_COLOR='BLUE',
+      NUMBER_INITIAL_PERSONS=60, PERS_ID='person', MESH_ID='2ndfloorgrid'/
+
+
+
+
+		======== THIRD FLOOR EVACUATION =========
+&EVAC ID='operationteam31', XB=14.0,26.0,3.0,26.0,15.6,16.8, COLOR='BLUE',
+      AVATAR_COLOR='BLUE',
+      NUMBER_INITIAL_PERSONS=30, PERS_ID='person', MESH_ID='3rdfloorgrid'/
+
+&EVAC ID='operationteam41', XB=14.0,26.0,3.0,26.0,20.9,22.0, COLOR='BLUE',
+      AVATAR_COLOR='BLUE',
+      NUMBER_INITIAL_PERSONS=30, PERS_ID='person', MESH_ID='4thfloorgrid'/
+13.2,30.9, 2.1,32.1, 20.763,22.0
+
+&SLCF PBX=5.0, QUANTITY='VELOCITY', VECTOR=.TRUE. /
+&SLCF PBX=15.0, QUANTITY='VELOCITY', VECTOR=.TRUE. /
+&SLCF PBX=199.0, QUANTITY='VELOCITY', VECTOR=.TRUE. /
+&SLCF PBY=5.0, QUANTITY='VELOCITY', VECTOR=.TRUE. /
+&SLCF PBZ=0.0, QUANTITY='VELOCITY', VECTOR=.TRUE. /
+
+*************************  MAJOR FIRE AREAS  ********************************
+&DEVC ID='EVACUATION_ROUTE_1ST_1', XYZ=34.6,8.0,6.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_1ST_2', XYZ=27.0,9.5,6.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_1ST_3', XYZ=19.0,9.5,6.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_1ST_4', XYZ=16.0,8.0,6.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_1ST_5', XYZ=20.0,16.0,6.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_1ST_6', XYZ=15.0,15.0,6.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_1ST_7', XYZ=6.0,5.0,6.0, QUANTITY= 'TEMPERATURE'/
+
+&DEVC ID='EVACUATION_ROUTE_2ND_1', XYZ=19.0,18.0,10.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_2ND_2', XYZ=18.6,8.0,10.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_2ND_3', XYZ=19.0,24,10.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_2ND_4', XYZ=18.6,13.0,10.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_2ND_5', XYZ=14.0,4.0,10.0, QUANTITY= 'TEMPERATURE'/
+
+&DEVC ID='EVACUATION_ROUTE_3RD_1', XYZ=21.4,20.0,16.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_3RD_2', XYZ=17.0,20.0,16.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_3RD_3', XYZ=17.0,10.0,16.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_3RD_4', XYZ=14.0,4.0,16.0, QUANTITY= 'TEMPERATURE'/
+
+&DEVC ID='EVACUATION_ROUTE_4TH_1', XYZ=15.0,11.0,22.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_4TH_2', XYZ=22.0,8.0,22.0, QUANTITY= 'TEMPERATURE'/
+&DEVC ID='EVACUATION_ROUTE_4TH_3', XYZ=14.0,4.0,22.0, QUANTITY= 'TEMPERATURE'/
+
+
+
+&VENT MB='XMIN' ,SURF_ID='OPEN' /
+&VENT MB='YMIN' ,SURF_ID='OPEN' /
+&VENT MB='ZMIN' ,SURF_ID='OPEN' /
+&VENT MB='XMAX' ,SURF_ID='OPEN' /
+&VENT MB='YMAX' ,SURF_ID='OPEN' /
+&VENT MB='ZMAX' ,SURF_ID='OPEN' /
+
+&TAIL /
+
