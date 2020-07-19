@@ -1,0 +1,100 @@
+
+&HEAD CHID='DoorTest_FallDown', TITLE='door flow test, 2.0' /
+door width 1.00 m, (dw=0.2m)
+
+&MESH IJK=150,150,1, XB=0.0,10.0, 0.0,15.0, 1.45,1.55, EVACUATION=.TRUE., 
+      EVAC_HUMANS=.TRUE., EVAC_Z_OFFSET=1.2, ID= 'FF1stFloor' /
+
+&TIME T_END= 70 /
+
+#DT=2.0 /
+
+&MISC EVACUATION_MC_MODE = .TRUE.,  EVACUATION_DRILL = .TRUE., RADIATION=.FALSE. /
+
+&MISC SURF_DEFAULT='INERT',
+      EVAC_SURF_DEFAULT='EVAC_WALL',
+      RADIATION=.FALSE. /
+
+#&DUMP SMOKE3D=.FALSE.,
+      NFRAMES=200,
+      DT_PART=0.1,
+      DT_HRR =0.1,
+      DT_SLCF=1000000.0,
+      DT_BNDF=1000000.0,
+      DT_PL3D=1000000.0,
+      DT_ISOF=1000000.0 
+	  FLUSH_FILE_BUFFERS = .false. /
+
+&SURF ID='EVAC_WALL' ,COLOR='BLACK' /
+&SURF ID='OUTFLOW' ,VEL= +0.000001 ,TAU_V=0.1, COLOR='BLUE' /
+  
+&OBST XB= 0.0, 10.0,  0.0, 0.1, 0.0,2.0,  /
+&OBST XB= 0.0, 0.1, 0.0,10.0, 0.0,2.0,    /
+&OBST XB= 9.9, 10.0, 0.0,10.0, 0.0,2.0,  /
+&OBST XB= 3.0, 3.1, 10.0,15.0, 0.0,2.0,   /
+&OBST XB= 7.0, 7.1, 10.0,15.0, 0.0,2.0, /
+&OBST XB= 0.0, 10.0, 10.0,10.1, 0.0,2.0,  /
+&HOLE XB= 4.5, 5.5, 10.0,10.1, 0.0,2.0,  / door
+&VENT XB= 3.0, 7.0, 15.0,15.0, 1.45,1.55, SURF_ID='OUTFLOW', EVACUATION=.TRUE. /
+
+&EXIT ID='TopExit', IOR= +2,
+      FYI= 'Comment line',
+      COUNT_ONLY=.FALSE. ,
+      MESH_ID = 'FF1stFloor',
+      XYZ= 7.5, 14.5, 1.50,
+      XB= 3.0,7.0, 15.0,15.0, 1.45,1.55 /
+
+#&EXIT ID='TopExitCount', IOR= +2,
+      FYI= 'Comment line',
+      MESH_ID='FF1stFloor', 
+      COUNT_ONLY=.TRUE. ,
+      XB= 4.0,6.0, 10.1,10.1, 1.45,1.55 /
+
+
+In our testing we will set VEL_MEAN in the range of 1m/s - 5m/s
+1m/s 2m/s 3m/s 4m/s 5m/s
+Faster-Is-Slower Effect is expected to be observed
+
+&PERS ID='Adult',
+      FYI='Male+Female diameter and velocity',
+      DEFAULT_PROPERTIES='Adult',
+      PRE_EVAC_DIST=0,PRE_MEAN=1.0,
+      DET_EVAC_DIST=0,DET_MEAN=0.0,
+      DENS_INIT=40.0,
+      VEL_MEAN=7.0
+      HUMAN_SMOKE_HEIGHT=1.60,
+      OUTPUT_SPEED=.TRUE.,
+      OUTPUT_CONTACT_FORCE=.TRUE.,
+      OUTPUT_TOTAL_FORCE=.TRUE.,
+      COLOR_METHOD = 0 
+	  TAU_FALL_DOWN=3.0 
+	  FCONST_A = 600
+	  FCONST_B = 0.08 
+	  DEAD_COLOR = 'WHITE' /
+	  GROUP_FORCE = 3
+
+The integer variable GROUP_FORCE switches on the group force.  Users can modify this variable by using PERS Namelist. 
+GROUP_FORCE == 0: Traditional Social Force
+GROUP_FORCE == 1: Desired Distance - Repulsive Force - Max
+GROUP_FORCE == 2: Desired Distance - Repulsive Force - No Max
+GROUP_FORCE == 3: Group Force - Repusion or Cohesion
+
+&EVAC ID='EvacAdult',
+      NUMBER_INITIAL_PERSONS= 60,
+      XB= 3.0, 7.0, 3.8, 9.8, 1.5,1.5,
+      AVATAR_COLOR= 'RED',
+      ANGLE= 90,
+      KNOWN_DOOR_NAMES='TopExit',
+      KNOWN_DOOR_PROBS=1.0,
+      PERS_ID='Adult' /
+      AFACTOR = 0 0.1 0 0 0 0 0 0 0 
+      BFACTOR = 0 6 0 0 0 0 0 0 0 
+      DFACTOR = 0 2 0 0 0 0 0 0 0 /
+
+In our testing we will set DFACTOR in the range of 0.5m - 2m
+0.5m 1m 1.5m 2m
+
+Next line could be used to plot the evacuation flow fields:
+&SLCF PBZ=1.5, QUANTITY='VELOCITY', VECTOR = .TRUE., EVACUATION=.TRUE. / 
+
+&TAIL /
