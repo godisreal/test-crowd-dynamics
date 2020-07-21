@@ -37,7 +37,7 @@ GITINFOPGI=-Mpreprocess $(GITINFO_BASE) -DBUILDDATE_PP=\""$(BUILD_DATE)\""
 
 # Definition of the non-MPI object variables
 
-obj_serial = prec.o mpis.o cons.o data.o type.o func.o evac.o ctrl.o dump.o read.o init.o main.o
+obj_serial = prec.o mpis.o cons.o data.o type.o func.o evac.o ctrl.o dump.o read.o main.o
 
 objwin_serial = $(obj_serial:.o=.obj)
 
@@ -575,7 +575,7 @@ evac.o : func.o prec.o cons.o type.o data.o #ieva.o
 read.o : func.o prec.o cons.o type.o ctrl.o evac.o data.o
 #init.o : func.o prec.o cons.o type.o data.o evac.o #pois.o 
 dump.o : func.o prec.o cons.o type.o evac.o data.o #scrc.o 
-main.o : func.o prec.o cons.o type.o evac.o dump.o read.o init.o ctrl.o data.o #ieva.o 
+main.o : func.o prec.o cons.o type.o evac.o dump.o read.o ctrl.o data.o #ieva.o 
 
 cons.obj : prec.obj
 mpis.obj : prec.obj
@@ -601,7 +601,7 @@ evac.obj : func.obj prec.obj cons.obj type.obj data.obj #ieva.obj
 read.obj : func.obj prec.obj cons.obj type.obj ctrl.obj evac.obj data.obj 
 #init.obj : func.obj prec.obj cons.obj type.obj data.obj evac.obj #pois.obj
 dump.obj : func.obj prec.obj cons.obj type.obj evac.obj data.obj #scrc.obj
-main.obj : func.obj prec.obj cons.obj type.obj evac.obj dump.obj read.obj init.obj ctrl.obj data.obj
+main.obj : func.obj prec.obj cons.obj type.obj evac.obj dump.obj read.obj ctrl.obj data.obj #init.obj
 
 #*** Clean Target to remove Object and Module files ***
 
