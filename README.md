@@ -8,5 +8,5 @@ If you you have any comment or suggestion, please feel free to send me a message
 ![](https://github.com/godisreal/test-group-dynamics/blob/master/img/groups.PNG)
 ![](https://github.com/godisreal/test-group-dynamics/blob/master/img/Ex2018Test-SmokeFED_0036.png)
 
-Major revision of evac source code (i.e., evac.f90) is based on the source in FDS repository.  If you would like to compile a version yourself, please take a look at the instruction in code folder.  
+Major revision of source code is evac.f90, and it is from the original source in FDS repository.  If you would like to compile a version yourself, please take a look at the instruction in code folder.  
 https://github.com/firemodels/fds/
