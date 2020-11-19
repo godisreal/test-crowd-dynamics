@@ -1,0 +1,153 @@
+
+ FDS+Evac Evacuation Module
+ FDS+Evac Version         : 2.5.2
+
+ FDS+Evac Color_Method    : 0
+ FDS+Evac: Evacuation drill mode 
+ FDS+Evac: Default mass extinction coeff is used:      8700.00
+ FDS+Evac: Fallind down algoritm is used
+           TAU_FALL_DOWN  =         3.00
+           D_OVERLAP_FALL =         0.05
+           A_FAC_FALLEN   =         1.00
+           PROB_FALL_DOWN =        -1.00
+           F_MIN_FALL     =      2000.00
+           F_MAX_FALL     =      9000.00
+ FDS+Evac EFF File: DoorTest_FallDown_evac.eff is read in and used
+
+SHOW DFACTOR_MATRIX
+
+  1.000
+  1.000
+  1.000
+  1.000
+SHOW DFACTOR_MATRIX
+
+
+
+    1.000
+    1.000
+
+
+    1.000
+    1.000
+ EVAC: Time     0.00 mesh 1 number of humans 60
+
+ INIT: Nash Changes per agent close enough:     0.0000    0.0500
+ INIT: Changes per agent           0.45, Nash iterations       2
+
+ EVAC: Initial positions of the agents
+ Agent      X       Y       Z    Tpre    Tdet   Dia    V0   Tau   I_gr I_ff I_Color
+     1    5.61    8.03    1.50    1.00    0.00  0.46  1.08  1.02    -1   1      1
+     2    4.12    4.35    1.50    1.00    0.00  0.46  1.31  1.07    -2   1      1
+     3    6.57    9.80    1.50    1.00    0.00  0.48  1.47  1.13    -3   1      1
+     4    4.35    7.37    1.50    1.00    0.00  0.47  1.29  1.05    -4   1      1
+     5    5.09    8.10    1.50    1.00    0.00  0.54  1.22  1.18    -5   1      1
+     6    6.88    5.03    1.50    1.00    0.00  0.51  0.99  0.81    -6   1      1
+     7    5.39    7.71    1.50    1.00    0.00  0.54  1.04  1.07    -7   1      1
+     8    5.20    4.32    1.50    1.00    0.00  0.48  1.07  1.02    -8   1      1
+     9    3.15    9.34    1.50    1.00    0.00  0.48  1.24  0.93    -9   1      1
+    10    3.77    5.94    1.50    1.00    0.00  0.58  1.54  1.15   -10   1      1
+    11    4.92    7.57    1.50    1.00    0.00  0.50  0.95  0.99   -11   1      1
+    12    4.70    9.05    1.50    1.00    0.00  0.57  1.34  0.90   -12   1      1
+    13    3.61    8.36    1.50    1.00    0.00  0.45  1.45  0.98   -13   1      1
+    14    4.22    7.66    1.50    1.00    0.00  0.55  1.07  1.15   -14   1      1
+    15    4.93    9.27    1.50    1.00    0.00  0.54  1.26  0.89   -15   1      1
+    16    4.39    4.22    1.50    1.00    0.00  0.45  1.23  1.14   -16   1      1
+    17    4.82    9.55    1.50    1.00    0.00  0.50  0.98  0.97   -17   1      1
+    18    3.76    5.37    1.50    1.00    0.00  0.57  1.03  0.92   -18   1      1
+    19    6.32    4.05    1.50    1.00    0.00  0.48  1.35  1.20   -19   1      1
+    20    4.51    5.21    1.50    1.00    0.00  0.49  1.32  1.02   -20   1      1
+    21    5.89    6.50    1.50    1.00    0.00  0.44  1.07  1.18   -21   1      1
+    22    6.17    5.14    1.50    1.00    0.00  0.56  1.47  1.01   -22   1      1
+    23    6.66    4.54    1.50    1.00    0.00  0.55  1.43  0.85   -23   1      1
+    24    3.53    4.91    1.50    1.00    0.00  0.53  1.26  1.18   -24   1      1
+    25    4.57    8.63    1.50    1.00    0.00  0.54  1.26  1.08   -25   1      1
+    26    6.31    6.65    1.50    1.00    0.00  0.44  1.02  0.99   -26   1      1
+    27    3.10    8.11    1.50    1.00    0.00  0.44  0.99  1.15   -27   1      1
+    28    4.97    4.80    1.50    1.00    0.00  0.51  1.48  0.86   -28   1      1
+    29    5.45    9.11    1.50    1.00    0.00  0.55  1.19  1.12   -29   1      1
+    30    6.69    9.46    1.50    1.00    0.00  0.58  1.49  1.15   -30   1      1
+    31    3.41    4.74    1.50    1.00    0.00  0.52  1.49  1.04   -31   1      1
+    32    4.27    7.00    1.50    1.00    0.00  0.48  1.31  1.08   -32   1      1
+    33    6.93    6.28    1.50    1.00    0.00  0.55  1.00  0.82   -33   1      1
+    34    6.54    9.06    1.50    1.00    0.00  0.52  1.47  0.85   -34   1      1
+    35    5.87    7.03    1.50    1.00    0.00  0.52  0.99  1.04   -35   1      1
+    36    5.66    5.24    1.50    1.00    0.00  0.55  0.98  1.16   -36   1      1
+    37    5.35    4.96    1.50    1.00    0.00  0.50  1.02  1.00   -37   1      1
+    38    5.96    4.41    1.50    1.00    0.00  0.50  1.25  0.90   -38   1      1
+    39    3.86    7.80    1.50    1.00    0.00  0.56  0.95  0.93   -39   1      1
+    40    3.24    4.20    1.50    1.00    0.00  0.58  1.45  1.02   -40   1      1
+    41    5.54    6.91    1.50    1.00    0.00  0.46  1.17  1.16   -41   1      1
+    42    4.02    8.15    1.50    1.00    0.00  0.47  0.97  1.12   -42   1      1
+    43    6.41    7.61    1.50    1.00    0.00  0.58  1.45  1.08   -43   1      1
+    44    6.76    4.17    1.50    1.00    0.00  0.50  1.53  1.07   -44   1      1
+    45    5.94    7.92    1.50    1.00    0.00  0.50  1.34  0.91   -45   1      1
+    46    6.62    8.36    1.50    1.00    0.00  0.52  1.35  1.19   -46   1      1
+    47    3.18    6.37    1.50    1.00    0.00  0.57  0.97  0.87   -47   1      1
+    48    5.59    5.59    1.50    1.00    0.00  0.57  1.06  1.10   -48   1      1
+    49    5.48    8.25    1.50    1.00    0.00  0.56  1.28  0.98   -49   1      1
+    50    6.66    6.42    1.50    1.00    0.00  0.45  1.16  0.83   -50   1      1
+    51    5.31    9.53    1.50    1.00    0.00  0.54  1.18  1.00   -51   1      1
+    52    3.92    9.78    1.50    1.00    0.00  0.55  1.26  0.97   -52   1      1
+    53    5.38    8.46    1.50    1.00    0.00  0.51  1.34  1.14   -53   1      1
+    54    5.29    5.72    1.50    1.00    0.00  0.52  1.44  0.84   -54   1      1
+    55    3.60    4.41    1.50    1.00    0.00  0.56  1.53  1.00   -55   1      1
+    56    5.59    7.25    1.50    1.00    0.00  0.47  1.32  1.15   -56   1      1
+    57    6.72    7.77    1.50    1.00    0.00  0.58  1.44  0.89   -57   1      1
+    58    3.13    7.37    1.50    1.00    0.00  0.44  1.48  1.16   -58   1      1
+    59    3.98    4.07    1.50    1.00    0.00  0.58  1.40  1.11   -59   1      1
+    60    6.98    8.19    1.50    1.00    0.00  0.51  1.06  1.09   -60   1      1
+
+
+ Agent n:o    17 out at     6.88 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    51 out at     7.15 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    15 out at     7.17 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o     3 out at     7.71 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    29 out at     7.80 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    12 out at     8.17 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    25 out at     8.69 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    13 out at     9.11 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    49 out at     9.12 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o     1 out at    10.30 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o     5 out at    10.54 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    30 out at    10.93 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    57 out at    11.66 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o     7 out at    11.86 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    14 out at    14.13 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    11 out at    15.10 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    56 out at    15.38 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o     4 out at    16.77 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    46 out at    18.43 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    41 out at    19.05 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    54 out at    22.38 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    42 out at    23.15 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    32 out at    23.45 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    35 out at    23.94 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    20 out at    24.37 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    26 out at    24.44 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    21 out at    25.71 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    39 out at    26.44 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    50 out at    26.80 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    60 out at    27.97 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    18 out at    29.66 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    31 out at    29.88 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    48 out at    30.61 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o     2 out at    30.75 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    22 out at    31.24 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    47 out at    33.30 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    28 out at    33.55 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    38 out at    34.29 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    40 out at    34.74 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    55 out at    35.41 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    24 out at    35.65 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    44 out at    36.38 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    37 out at    36.79 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    27 out at    37.99 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    23 out at    38.27 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    33 out at    39.59 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o     6 out at    40.27 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    16 out at    40.63 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o     8 out at    41.10 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    19 out at    41.52 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    59 out at    41.97 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2
+ Agent n:o    58 out at    42.83 s, exit TopExit, FED=  0.0000, Color_i=   1  1  2

@@ -5,7 +5,7 @@ door width 1.00 m, (dw=0.2m)
 &MESH IJK=100,150,1, XB=0.0,10.0, 0.0,15.0, 1.45,1.55, EVACUATION=.TRUE., 
       EVAC_HUMANS=.TRUE., EVAC_Z_OFFSET=1.2, ID= 'FF1stFloor' /
 
-&TIME T_END= 60.0, DT=1.0 /
+&TIME T_END= 60, DT=1.0 /
 
 &MISC EVACUATION_MC_MODE = .TRUE.,  EVACUATION_DRILL = .TRUE., RADIATION=.FALSE. /
 
@@ -14,10 +14,10 @@ door width 1.00 m, (dw=0.2m)
       RADIATION=.FALSE. /
 
 #&DUMP SMOKE3D=.FALSE.,
-      NFRAMES=2000,
+      NFRAMES=200,
       DT_PART=0.1,
-      DT_HRR =1000000.0,
-      DT_SLCF=1.0,
+      DT_HRR =0.1,
+      DT_SLCF=1000000.0,
       DT_BNDF=1000000.0,
       DT_PL3D=1000000.0,
       DT_ISOF=1000000.0 
@@ -68,8 +68,8 @@ Faster-Is-Slower Effect is expected to be observed
 	  TAU_FALL_DOWN=3.0 
 	  FCONST_A = 60
 	  FCONST_B = 0.08 
-	  GROUP_FORCE = .FALSE.,
 	  DEAD_COLOR = 'WHITE' /
+	  GROUP_FORCE = .FALSE. /
 
 The integer variable GROUP_FORCE switches on the group force.  Users can modify this variable by using PERS Namelist. 
 GROUP_FORCE == 0: Traditional Social Force

@@ -1,0 +1,291 @@
+
+ Fire Dynamics Simulator
+
+ Current Date     : November 18, 2020  00:49:20
+ Version          : FDS 6.5.3
+ Revision         : 
+ Revision Date    : 
+ Compilation Date : 12/15/2018 Sat  01:42 PM
+
+ MPI Disabled
+ OpenMP Disabled
+
+ Job TITLE        : door flow test 2020
+ Job ID string    : DoorTest_FallDown
+
+
+ Grid Dimensions, Mesh     1
+
+   Cells in the X Direction           100
+   Cells in the Y Direction           150
+   Cells in the Z Direction             1
+
+
+ Physical Dimensions, Mesh     1
+
+   Length (m)                      10.000
+   Width  (m)                      15.000
+   Height (m)                       0.100
+   Initial Time Step (s)            1.000
+
+ Grid Dimensions, Mesh     2
+
+   Cells in the X Direction           100
+   Cells in the Y Direction           150
+   Cells in the Z Direction             1
+
+
+ Physical Dimensions, Mesh     2
+
+   Length (m)                      10.000
+   Width  (m)                      15.000
+   Height (m)                       0.580
+   Initial Time Step (s)            1.000
+
+
+ Miscellaneous Parameters
+
+   Simulation Start Time (s)          0.0
+   Simulation End Time (s)           60.0
+   LES Calculation
+   Deardorff Model (C_DEARDORFF)     0.10
+   Turbulent Prandtl Number          0.50
+   Turbulent Schmidt Number          0.50
+   Ambient Temperature (C)          20.00
+
+
+ Mass Fraction Transformation Matrix to Convert Species Mixtures (Columns) to Primitive Species (Rows)
+
+                         AIR     
+   NITROGEN              0.763077
+   OXYGEN                0.231181
+   CARBON DIOXIDE        0.000592
+   WATER VAPOR           0.005149
+
+
+ Primitive Species Information
+
+   NITROGEN
+   Gas Species
+   Molecular Weight (g/mol)            28.01340
+   Ambient Density (kg/m^3)            1.165
+   Enthalpy of Formation (J/kg)        0.00E+00
+
+   OXYGEN
+   Gas Species
+   Molecular Weight (g/mol)            31.99880
+   Ambient Density (kg/m^3)            1.330
+   Enthalpy of Formation (J/kg)        0.00E+00
+
+   CARBON DIOXIDE
+   Gas Species
+   Molecular Weight (g/mol)            44.00950
+   Ambient Density (kg/m^3)            1.830
+   Enthalpy of Formation (J/kg)       -8.94E+06
+
+   WATER VAPOR
+   Gas Species
+   Molecular Weight (g/mol)            18.01528
+   Ambient Density (kg/m^3)            0.749
+   Enthalpy of Formation (J/kg)       -1.34E+07
+
+
+ Tracked (Lumped) Species Information
+
+   AIR
+   Molecular Weight (g/mol)            28.76564
+   Ambient Density (kg/m^3)            1.196
+   Initial Mass Fraction               1.000
+   Enthalpy of Formation (J/kg)     -7.44E+04
+
+   Sub Species                    Mass Fraction     Mole Fraction
+   NITROGEN                       7.630774E-01      7.835682E-01
+   OXYGEN                         2.311814E-01      2.078229E-01
+   CARBON DIOXIDE                 5.919362E-04      3.869034E-04
+   WATER VAPOR                    5.149269E-03      8.222023E-03
+ 
+     Viscosity (kg/m/s) Ambient,  293 K:  1.80E-05
+                                  500 K:  2.61E-05
+                                 1000 K:  4.13E-05
+                                 1500 K:  5.37E-05
+   Therm. Cond. (W/m/K) Ambient,  293 K:  2.56E-02
+                                  500 K:  3.81E-02
+                                 1000 K:  6.68E-02
+                                 1500 K:  9.24E-02
+        Enthalpy (J/kg) Ambient,  293 K: -7.97E+04
+                                  500 K: -1.36E+05
+                                 1000 K: -2.72E+05
+                                 1500 K: -4.08E+05
+    Spec. Heat (J/kg/K) Ambient,  293 K:  1.02E+03
+                                  500 K:  1.04E+03
+                                 1000 K:  1.16E+03
+                                 1500 K:  1.23E+03
+   Diff. Coeff. (m^2/s) Ambient,  293 K:  1.99E-05
+                                  500 K:  4.96E-05
+                                 1000 K:  1.58E-04
+                                 1500 K:  3.09E-04
+
+
+ Material Information
+
+
+ Surface Conditions
+
+   0 INERT (DEFAULT)
+
+   1 EVAC_WALL
+
+   2 OUTFLOW
+     Normal Velocity (m/s)         0.000
+     AIR Mass Fraction         1.000
+
+   3 OPEN
+     Passive Vent to Atmosphere
+
+   4 MIRROR
+     Symmetry Plane
+
+   5 INTERPOLATED
+
+   6 PERIODIC
+
+   7 HVAC
+
+   8 MASSLESS TRACER
+
+   9 DROPLET
+
+  10 VEGETATION
+
+  11 EVACUATION_OUTFLOW
+     Normal Velocity (m/s)         0.000
+
+  12 MASSLESS TARGET
+
+  13 PERIODIC WIND
+
+
+ Slice File Information, Mesh     1
+
+   Sampling Interval (s)             0.060
+
+   1 Nodes:   0 100   0 150   1   1, Quantity: VELOCITY
+   2 Nodes:   0 100   0 150   1   1, Quantity: U-VELOCITY
+   3 Nodes:   0 100   0 150   1   1, Quantity: V-VELOCITY
+   4 Nodes:   0 100   0 150   1   1, Quantity: W-VELOCITY
+
+
+
+ Run Time Diagnostics
+
+       Time Step       1   November 18, 2020  00:49:27
+       Step Size:    0.100E+01 s, Total Time:       1.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step       2   November 18, 2020  00:49:37
+       Step Size:    0.100E+01 s, Total Time:       2.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step       3   November 18, 2020  00:49:53
+       Step Size:    0.100E+01 s, Total Time:       3.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step       4   November 18, 2020  00:50:11
+       Step Size:    0.100E+01 s, Total Time:       4.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step       5   November 18, 2020  00:50:30
+       Step Size:    0.100E+01 s, Total Time:       5.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step       6   November 18, 2020  00:50:51
+       Step Size:    0.100E+01 s, Total Time:       6.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step       7   November 18, 2020  00:51:14
+       Step Size:    0.100E+01 s, Total Time:       7.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step       8   November 18, 2020  00:51:29
+       Step Size:    0.100E+01 s, Total Time:       8.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step       9   November 18, 2020  00:51:42
+       Step Size:    0.100E+01 s, Total Time:       9.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step      10   November 18, 2020  00:51:59
+       Step Size:    0.100E+01 s, Total Time:      10.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step      20   November 18, 2020  00:53:58
+       Step Size:    0.100E+01 s, Total Time:      20.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step      30   November 18, 2020  00:55:20
+       Step Size:    0.100E+01 s, Total Time:      30.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step      40   November 18, 2020  00:55:59
+       Step Size:    0.100E+01 s, Total Time:      40.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step      50   November 18, 2020  00:56:00
+       Step Size:    0.100E+01 s, Total Time:      50.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+       Time Step      60   November 18, 2020  00:56:01
+       Step Size:    0.100E+01 s, Total Time:      60.00 s
+       Pressure Iterations:      1
+       Maximum Velocity Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       Maximum Pressure Error:  0.00E+00 on Mesh   1 at (   0   0   0)
+       ---------------------------------------------------------------
+
+
+
+ Time Stepping Wall Clock Time (s):      400.813
+ Total Elapsed Wall Clock Time (s):      401.516
+
+STOP: FDS completed successfully (CHID: DoorTest_FallDown)
