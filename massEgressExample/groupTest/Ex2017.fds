@@ -1,0 +1,306 @@
+ FDS+Evac version: FDS+Evac 6.5.3
+ All material properties etc. are completely fabricated.
+
+ IMO MSC/Circ.1033 (6 June 2002) 'Interim Guidelines For
+ Evacuation Analyses for New and Existing Passenger Ships',
+ Annex 3 
+
+Example 2 for the Journal Paper
+
+&HEAD CHID='Ex2018Test',TITLE='WPWORK' /
+
+&MESH IJK=39,24,3, XB=-0.6,30.6, -0.6,18.6, 0.0,3.0 /
+
+&MESH IJK=156,96,1, XB=-0.6,30.6, -0.6,18.6, 0.4,1.6, EVACUATION=.TRUE., EVAC_HUMANS=.TRUE., EVAC_Z_OFFSET=1.0, ID = 'MainEvacGrid' /
+
+&TIME T_END=90.0, DT=0.2 /
+
+&MISC SURF_DEFAULT = 'WALL',
+      RADIATION=.FALSE.
+	EVAC_SURF_DEFAULT = 'EVAC_WALL',  
+	EVACUATION_DRILL=.TRUE.  /
+
+*EVACUATION_MC_MODE=.TRUE. 
+*EVACUATION_DRILL=.FALSE.  /
+*ISOTHERMAL=.FALSE.
+
+
+&DUMP SMOKE3D=.TRUE.,
+      NFRAMES=200,
+      DT_PART=0.5,
+      DT_HRR=1.0,
+      DT_SLCF=1.0,
+      DT_BNDF=5.0,
+      DT_PL3D=1000.0,
+      DT_ISOF=5.0 /
+
+&REAC ID         = 'POLYURETHANE'
+      FYI        = 'C_6.3 H_7.1 N O_2.1, NFPA Handbook, Babrauskas'
+      SOOT_YIELD = 0.10
+      N          = 1.0
+      C          = 6.3
+      H          = 7.1
+      O          = 2.1  /
+
+&SURF ID='BURNER', HRRPUA=1000., COLOR='RASPBERRY' /
+
+&MATL ID            = 'GYPSUM PLASTER'
+      FYI           = 'Quintiere, Fire Behavior'
+      CONDUCTIVITY  = 0.48
+      SPECIFIC_HEAT = 0.84
+      DENSITY       = 1440. /
+
+&SURF ID             = 'WALL'
+      RGB            = 160,160,160
+      MATL_ID        = 'GYPSUM PLASTER'
+      THICKNESS      = 0.012 /
+
+ Boundary condition for the evacuation flow fields:
+&SURF ID = 'OUTFLOW', VEL = +0.000001, TAU_V=0.1 /
+
+ Default material for evacuation meshes is INERT and its color
+ can not be changed esily in Smokeview. Thus, an evacuation 
+ material is defined below, which has only color:
+&SURF ID    = 'EVAC_WALL'
+      RGB   = 200,0,200 / or COLOR
+ 
+=======================================================
+============= FIRE FDS GEOMETRY STARTS ================
+=======================================================
+
+Basic Outlines
+&OBST XB = 0.0, 20.0, 17.9,18.0, 0.0,3.0, SURF_ID='WALL' / 
+&OBST XB = 0.0, 20.0, 0.0, 0.1, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 0.0, 0.1,  0.0,18.0, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 20.0,20.1, 0.0,18.0, 0.0,3.0, SURF_ID='WALL' / 
+
+Right Lounge Area
+&OBST XB = 20.0,30.0,  2.5,2.6,  0.0,3.0, SURF_ID='WALL' / 
+&OBST XB = 20.0,27.0, 15.9,16.0, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 27.0,30.0, 17.9,18.0, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 29.9,30.0,  2.5,18.0, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 27.0,27.1,  9.0,18.0, 0.0,3.0, SURF_ID='WALL' /
+
+&OBST XB = 27.0,30.0, 9.0,9.1, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 27.0,30.0, 13.5,13.6, 0.0,3.0, SURF_ID='WALL' /
+
+Left Hall Area
+&OBST XB = 17.5,17.6, 11.0,18.0, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 7.5,7.6, 11.0,18.0, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 7.5,20.0, 11.0,11.1, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 17.5,20.0, 14.5,14.6, 0.0,3.0, SURF_ID='WALL' /
+
+&OBST XB = 7.5,7.6, 2.0,8.6, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 0.0,7.5, 8.5,8.6, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 10.0,15.0, 8.5,8.6, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 10.0,10.1, 2.0,8.6, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 14.9,15.0, 0.0,8.6, 0.0,3.0, SURF_ID='WALL' /
+&OBST XB = 3.8,3.9, 0.0,1.0, 0.0,3.0, SURF_ID='WALL' /
+
+Doors and Exits in Right Lounge Area
+&HOLE XB= 26.8,27.2, 14.5,15.5, 0.0,2.0 /
+&HOLE XB= 26.8,27.2, 11,12, 0.0,2.0 /
+
+Doors and Exits in Left Lounge Area
+&HOLE XB= 19.8,20.2, 14.6,15.6, 0.0,2.0 /
+&HOLE XB= 19.8,20.2, 11.1,12.1, 0.0,2.0 /
+&HOLE XB= 19.8,20.2, 9.6,10.6, 0.0,2.0 /
+&HOLE XB= 14.8,15.2, 0.1,2.0, 0.0,2.0 /
+&HOLE XB= 3.0,4.6, 8.4,8.7, 0.0,2.0 /
+
+&HOLE XB= 7.5,8.5, 10.8,11.2, 0.0,2.0 /
+&HOLE XB= 16.5,17.5, 10.8,11.2, 0.0,2.0 /
+
+The fire as a burner.
+&OBST XB= 28.50, 29.50, 10.00, 11.00, 0.00, 0.60, SURF_ID='INERT' /
+&VENT XB= 28.50, 29.50, 10.00, 11.00, 0.60, 0.60, SURF_ID='BURNER' /
+
+&VENT MB='YMIN',SURF_ID='OPEN' / 
+&VENT MB='YMAX',SURF_ID='OPEN' / 
+
+=======================================================
+============= FIRE FDS GEOMETRY ENDS ==================
+=======================================================
+
+=======================================================
+==================== EVAC STARTS ======================
+=======================================================
+Main evac grid vents, there should be a VENT on every place,
+where agents can go out of the calculation in the main evacuation
+mesh.
+
+*&OBST XB= 23.0,24.6, 15.8,16.0, 0.0,3.0, RGB=0,100,100 /
+*&VENT XB= 23.0,24.6, 15.8,15.8, 0.4,1.6, SURF_ID='OUTFLOW',
+      MESH_ID='MainEvacGrid', EVACUATION=.TRUE. / 
+
+&EXIT ID='Exit1', IOR = +2,
+      FYI = 'Comment line',
+      COUNT_ONLY=.FALSE.,
+      XYZ= 23.8, 15.6, 1.0,
+      XB = 23.0,24.6,  15.6,15.6,  0.4,1.6,
+	TIME_CLOSE=30.0 /
+
+*&VENT XB=  23.0,24.6,  15.8,15.8,  0.4,1.6,  SURF_ID='OUTFLOW',
+      MESH_ID='RightUpperExitGrid', EVACUATION=.TRUE. /
+
+
+*&OBST XB= 29.8,30.0, 3.0,4.6, 0.0,3.0, RGB=0,100,100 /
+*&VENT XB= 29.8,29.8, 3.0,4.6, 0.4,1.6, SURF_ID='OUTFLOW',
+      MESH_ID='MainEvacGrid', EVACUATION=.TRUE. / 
+
+&EXIT ID='Exit2', IOR = +1,
+      FYI = 'Comment line',
+      COUNT_ONLY=.FALSE.,
+      XYZ= 29.8, 3.8, 1.0,
+      XB = 29.8,29.8,  3.0,4.6,  0.4,1.6,
+	TIME_CLOSE=60.0 /
+
+*&VENT XB=  29.8,29.8,  3.0,4.6,  0.4,1.6, SURF_ID='OUTFLOW',
+      MESH_ID='RightLowerExitGrid', EVACUATION=.TRUE. /
+
+
+*&OBST XB= 0.0,0.2, 15.4,17.0, 0.0,3.0, RGB=0,100,100 /
+*&VENT XB= 0.2,0.2, 15.4,17.0, 0.4,1.6, SURF_ID='OUTFLOW',
+      MESH_ID='MainEvacGrid', EVACUATION=.TRUE. / 
+
+&EXIT ID='Exit3', IOR = -1,
+      FYI = 'Useful Exit',
+      COUNT_ONLY=.FALSE.,
+      XYZ= 0.3, 16.0, 1.0,
+      XB = 0.2,0.2,  15.0,17.0,  0.4,1.6 /
+
+*&VENT XB=  0.2,0.2,  15.4,17.0,  0.4,1.6, SURF_ID='OUTFLOW',
+      MESH_ID='LeftUpperExitGrid', EVACUATION=.TRUE. /
+
+
+*&OBST XB= 1.0,2.6, 0.0,0.2, 0.0,3.0, RGB=0,100,100 / 
+*&VENT XB= 1.0,2.6, 0.2,0.2, 0.4,1.6, SURF_ID='OUTFLOW',
+      MESH_ID='MainEvacGrid', EVACUATION=.TRUE. /
+
+&EXIT ID='Exit4', IOR = -2,
+      FYI = 'Comment line',
+      COUNT_ONLY=.FALSE.,
+      XYZ= 1.8, 0.3, 1.0,
+      XB = 1.0,2.6,  0.2,0.2,  0.4,1.6 /
+
+*&VENT XB = 1.0,2.6,  0.2,0.2,  0.4,1.6, SURF_ID='OUTFLOW',
+      MESH_ID='LeftLowerExitGrid', EVACUATION=.TRUE. /
+
+
+reaction time delay or detection time delay.
+  
+&DEVC ID='HeatDet', PROP_ID='Acme Heat', XYZ=3.5,3.5,1.4,     EVACUATION=.TRUE. /
+&PROP ID='Acme Heat', QUANTITY='LINK TEMPERATURE', RTI=50.0, ACTIVATION_TEMPERATURE=44.0 /
+
+&EDEV ID='Edev_det', GLOBAL=.TRUE., TIME_DELAY=0.0, PROB=1.0,
+      PRE_EVAC_DIST=0, PRE_MEAN=10.0,
+      INPUT_ID='HeatDet' /
+
+
+&PERS ID='Adult',
+      FYI='Male+Female diameter and velocity',
+      DEFAULT_PROPERTIES='Adult',
+      VELOCITY_DIST=1, 
+	VEL_LOW=0.38,VEL_HIGH=0.61,
+      PRE_EVAC_DIST=0, PRE_MEAN=0.0,
+      DET_EVAC_DIST=0, DET_MEAN=0.0,
+      COLOR_METHOD = 0,
+	DENS_INIT=6.0 
+	GROUP_FORCE = .TRUE.
+      OUTPUT_SPEED = .TRUE.
+      OUTPUT_FED = .TRUE.
+	OUTPUT_CONTACT_FORCE = .TRUE.
+	OUTPUT_TOTAL_FORCE = .TRUE.
+ 	OUTPUT_MOTIVE_FORCE = .TRUE. 
+	OUTPUT_GROUP_FORCE = .TRUE. 
+	OUTPUT_NERVOUSNESS = .TRUE. 
+	OUTPUT_DENSITY = .TRUE. /
+
+Initial position of the humans
+
+&EVAC ID = 'Group_1', 
+      NUMBER_INITIAL_PERSONS = 30,
+      FYI = 'Comment line',
+	XB = 1.0,6.0, 10.0,16.0, 1.0,1.0
+	AVATAR_COLOR = 'BLUE',
+	KNOWN_DOOR_NAMES = 'Exit1','Exit2','Exit3','Exit4'
+	KNOWN_DOOR_PROBS = 1.0, 1.0, 0.6, 0.6 
+      PERS_ID = 'Adult' 
+	AFACTOR = 0.0 0.1 0.1 0.1 0.0 0.0 0.0 0.0 0.0
+	BFACTOR = 0.0 8.0 3.0 3.0 0.0 0.0 0.0 0.0 0.0      
+	DFACTOR = 0.0 1.0 3.0 3.0 0.0 0.0 0.0 0.0 0.0 /  
+
+&EVAC ID = 'Group_2', 
+      NUMBER_INITIAL_PERSONS = 20,
+      FYI = 'Comment line',
+	XB = 1.0,6.0, 2.0,8.0, 1.0,1.0
+	AVATAR_COLOR = 'RED',
+	KNOWN_DOOR_NAMES = 'Exit1','Exit2','Exit3','Exit4'
+	KNOWN_DOOR_PROBS = 1.0, 0.7, 0.8, 0.7
+        PERS_ID = 'Adult' 
+	AFACTOR = 0.0 0.1 0.1 0.1 0.0 0.0 0.0 0.0 0.0
+	BFACTOR = 0.0 3.0 7.0 2.0 0.0 0.0 0.0 0.0 0.0       
+	DFACTOR = 0.0 2.0 1.0 3.0 0.0 0.0 0.0 0.0 0.0 /
+
+&EVAC ID = 'Group_3', 
+      NUMBER_INITIAL_PERSONS = 10,
+      FYI = 'Comment line',
+	XB = 11.0,17.0, 11.0,17.5, 1.0,1.0
+	AVATAR_COLOR = 'BLACK',
+	KNOWN_DOOR_NAMES = 'Exit1', 'Exit3'
+	KNOWN_DOOR_PROBS = 0.3, 0.7
+      PERS_ID = 'Adult' 
+	AFACTOR = 0.0 0.1 0.1 0.1 0.0 0.0 0.0 0.0 0.0
+	BFACTOR = 0.0 3.0 2.0 10.0 0.0 0.0 0.0 0.0 0.0       
+	DFACTOR = 0.0 2.0 3.0 1.0 0.0 0.0 0.0 0.0 0.0 /
+
+&EVAC ID = 'Group_4', 
+      NUMBER_INITIAL_PERSONS = 20,
+      FYI = 'Comment line',
+	XB = 11.0,15.0, 1.0,9.0, 1.0,1.0
+	AVATAR_COLOR = 'GREEN',
+	KNOWN_DOOR_NAMES = 'Exit2', 'Exit3', 'Exit4'
+	KNOWN_DOOR_PROBS = 1.0, 1.0, 1.0
+      PERS_ID = 'Adult' / 
+	AFACTOR = 0.0 0.1 0.0 0.1 0.1 0.0 0.0 0.0 0.0
+	BFACTOR = 0.0 3.0 2.0 2.0 6.0 0.0 0.0 0.0 0.0       
+	DFACTOR = 0.0 2.0 3.0 1.0 2.0 0.0 0.0 0.0 0.0 /
+
+*&EVAC ID = 'Group_5', 
+      NUMBER_INITIAL_PERSONS = 30,
+      FYI = 'Comment line',
+	XB = 15.0,19.0, 2.0,8.0, 1.0,1.0
+	AVATAR_COLOR = 'BLACK' 
+	PERS_ID = 'Adult' /
+
+*	KNOWN_DOOR_NAMES = 'Exit1','Exit3','Exit4',
+*	KNOWN_DOOR_PROBS = 1.0, 0.5, 0.8
+
+
+=======================================================
+==================== EVAC ENDS ========================
+=======================================================
+
+=======================================================
+================ Fire Simulation ======================
+=======================================================
+
+An evacuation hole, i.e., do not put humans here (an EVHO is to an EVAC what a HOLE is for an OBST). By default an EVHO applies to all EVAC-lines.
+    EVAC_ID(optional): Only for humans from that EVAC-line
+    PERS_ID(optional): Only for those humans, whose PERS_ID matches
+
+&EVHO ID = 'Evho_Fire',
+      FYI = 'Do not put humans close to the fire',
+      XB = 28.0,30.0, 9.50,11.50, 0.4,1.6 /
+
+Fire calculation output.
+
+ BNDF QUANTITY='WALL_TEMPERATURE' / 
+&SLCF PBX=2.50, QUANTITY='TEMPERATURE' /
+&SLCF PBX=10.50, QUANTITY='TEMPERATURE' /
+&SLCF PBX=18.50, QUANTITY='TEMPERATURE' /
+
+Next line could be used to plot the evacuation flow fields:
+SLCF PBZ = 1.500, QUANTITY = 'VELOCITY', VECTOR = .TRUE./ 
+
+&TAIL /
