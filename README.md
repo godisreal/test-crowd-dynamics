@@ -11,10 +11,11 @@ If you would like to run the input file, please use fds6_dump205.exe to run exam
 If you would like to compile the executable by yourself, please use the source code in the following repo.  
 https://github.com/godisreal/fds-smv/tree/dev_653
 
+Major revision of source code is evac.f90, and it is from the original source in FDS repository.  If you would like to compile a version yourself, please take a look at the instruction in code folder.  Thank Randy McDermott.  
+https://github.com/firemodels/fds/
+
 If you you have any comment or suggestion, please feel free to send me a message or directly start an issue here.  Your comments are much appreciated.  
 
 ![](https://github.com/godisreal/test-group-dynamics/blob/master/img/groups.PNG)
 ![](https://github.com/godisreal/test-group-dynamics/blob/master/img/Ex2018Test-SmokeFED_0036.png)
 
-Major revision of source code is evac.f90, and it is from the original source in FDS repository.  If you would like to compile a version yourself, please take a look at the instruction in code folder.  
-https://github.com/firemodels/fds/
