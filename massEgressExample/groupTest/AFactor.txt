@@ -1,4 +1,0 @@
-For definition of AFactor, BFactor, DFactor, please refer to our document
-Modeling Group Behavior of Pedestrian Crowd
-
-AFactor: Better value is 0.01 in Pre-Evac stage.  
