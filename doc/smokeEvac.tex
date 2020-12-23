@@ -1,0 +1,91 @@
+\documentclass{article}
+\begin{document}
+
+\title{Simulation of Crowd Escape Under Hazardous Condition}
+\author{Peng Wang      Timo Korhonen}%
+
+%\address{}%
+%\email{}%
+
+%\thanks{}%
+%\subjclass{}%
+\maketitle
+
+% ----------------------------------------------------------------
+\begin{abstract}
+This brief report presents a model to characterize evacuees' response to hazardous stimuli during emergency egress, especially in smoke and fire condition.  The model is developed in consistency with stress theory, which explains how an organism reacts to environmental stimuli.  We integrate the theory in the well-known social-force model and apply the model to simulate crowd evacuation in fire emergency.  The algorithm is being tested in FDS+EVAC.  
+\end{abstract}
+
+%\keywords{Social Force, Smoke, Hazard}%
+%\date{}%
+%\dedicatory{}%
+%\commby{}%
+
+
+\section{Social Force Model and Stress Theory}
+
+In physiological or biological study, stress refers to an organism's reaction to a condition such as a threat, challenge or physical and psychological barrier.  For humans stress is normally perceived when we think the demand being placed on us exceed our ability to cope with, and it can be external and related to the environment, and it becomes effective by internal perceptions.  This paper will integrate the stress theory in the well-known social force model.  The motivation level $\mathbf{v}_i^0$ and $d_ij^0$ in social force model are the result of our perception, and are adapted to the environmental stressors.  As a result, stress?refers to agents' response and adaption to the environment, and it is feasible to extend social-force model to characterize the interplay between individuals and their surroundings.  As below we present a diagram to describe the interplay between individuals and their surroundings based on the extended social-force model.  
+
+In the above diagram environmental factors include facilities (e.g., alarm, guidance) and hazard (e.g., fire and smoke).  The resulting pedestrian motion is a response to stressors in environmental conditions, and $\mathbf{v}_i^0$ and $d_ij^0$ could vary both temporally and spatially.  In this paper we will focus on emergency egress and essentially present an approach to model how the hazard (i.e., fire and smoke) influence evacuees' escape behavior, we will briefly explain how to apply the above model in simulation of crowd evacuation as below.  
+
+
+\section{Adapting Desired Velocity To Environmental Stressors}
+
+When the fire/smoke spread towards people, people normally desire moving faster to escape from danger (Proulx , 1993; Ozel, 2001; Kuligowski, 2009).  Thus, we suggest that the desired velocity $\mathbf{v}_i^0$ should be increased when smoke density increases, and correspondingly the self-driving force is increased.  The fact that people may slow down in smoke areas is instead characterized by adding a resistance force which is proportional to the smoke density (SOOT_DENS).  This force describes how smoke impedes people's motion.  As a result, both of the self-driving force and smoke resistance are increased when people are walking in smoke areas.  If the self-driving force is larger than the resistance, people will accelerate, otherwise people will slow down (See Figure 1).  
+
+%In the simulation core there are four types of entities: agents, walls, doors and exits.
+%\textbf{Walls}: Walls are obstruction in a compartment geometry that confine agent %movement, and they set up the boundary of a room or certain space.  
+
+A. About the magnitude
+    The following plot exemplifies the increasing curve of the self-driving force and smoke resistance when the smoke density increases.  When the smoke density increases initially, the smoke is not thick so that people are able to speed up.  As the smoke density keeps increasing, the resistance from smoke is predominant and people have to slow down due to reduced percentage of oxygen and poor visibility on the path and surrounding facilities (Was, 2018).  In sum, whether people can accelerate or not critically depends on hazard condition.  In light smoke people can commonly speed up to escape from danger while in thick smoke it is difficult for people to find the path or exit, and they thus will slow down.  In other words, the hazard condition plays an important role.   
+	
+    The revised mathematical description of the pedestrian model is given as below.  
+	
+\begin{equation}\label{Eq_force}
+  \mathbf{f}_i = \frac{m_i}{\tau_i} \left( \mathbf{v}_i^0 -
+    \mathbf{v}_i\right) + \sum_{j \ne i} \left( \mathbf{f}_{ij}^{soc}
+    + \mathbf{f}_{ij}^{c} + \mathbf{f}_{ij}^{att} \right) + \sum_{w}
+  \left( \mathbf{f}^{soc}_{iw} + \mathbf{f}^{c}_{iw} \right) + \sum_{k}
+  \mathbf{f}_{ik}^{att} ~,
+\end{equation}
+	
+	where the resistance from hazards is added to the traditional pedestrian model.  This resistance is denoted by $mathbf{f}_i^h$, and it is supposed to be a function of the smoke density.  Other hazard characteristics can also be taken into account such as heat radiation.  Based on Equation (1), we may consider the hazard characteristics (e.g., smoke) as a kind of “spreading walls” that impede pedestrians' motion.  Pedestrian are able to go through such “spreading walls” if the smoke is not thick.  An example is that $mathbf{f}_i^h$ is a linear form of smoke density while the self-driving force (given by desired velocity $\mathbf{v}_i^0$) is the square root form or another linear form (See Figure 2).  Other specific mathematical description of $mathbf{f}_i^h$ and $\mathbf{v}_i^0$ can also be explored in the future.  
+
+    Other settings are not changed with respect to the forced-based model: $m_i$ is the mass of an individual.  The desired velocity is $\mathbf{v}_i^0$ and the physical velocity is denoted by $\mathbf{v}_i$, and both of them are functions of time $t$. The interaction from individual $j$ to individual $i$ is denoted by $mathbf{f}_ij$ and the force from walls or other facilities to individual $i$ is denoted by $mathbf{f}_iw$.  The detailed mathematical model is introduced in Helbing et. al., 2002 and 2005.  
+    In sum when modeling agents' interaction with outside, we need to differentiate the effect of desired velocity and hazard force.  The desired velocity is applied to characterize how agents intent to change the motion such as speed or direction.  In contrast the hazard force is used to describe if the outside condition permits such a change or not.  The two factor are sometimes conflicting, and they function together and give a whole picture of the model. 	
+	
+\section{Adapting Desired Distance To Environmental Stressors}
+In the field of social psychology, social norms are defined as "representations of appropriate behavior" in a certain situation or environment.  From the perspective of crowd modeling, the social norm is indicated by $d_ij^0$.  For example in elevators or entrance of a passageway, people commonly accept smaller proximal distance, and the desired interpersonal distance is thus smaller, and $d_ij^0$ is to be scaled down proportionally in these places.  
+
+%In brief, $d_ij^0$ is occasion-dependent, and it varies along with locations.  
+
+In emergency escape the interpersonal distance is also smaller than in normal situation.  
+The social attachment theory suggests that people usually seek for familiar ones (e.g., friends or parents) to relieve stress in face of danger, and this is rooted from our instinctive response to danger in childhood when a child seek for the parents for shelter.  Affiliated with familiar and trust individuals relieves our stress.  Thus, the interpersonal distance in emergency escape is smaller than in normal situation, and people need to exchange information with each other in emergency egress.  The social norm is thus modified such that $d_ij^0$ is scaled down also.  The parameter of $A_i$ and $B_i$ may also be scaled down so that the social force as a whole is reduced in such an occasion (Korhonen, 2017).   
+
+The concept of desired interpersonal distance agrees with another psychological concept of social norms.  Social norms are defined as "representations of appropriate behavior" in a certain situation or environment, and it defines proximal distance in various occasions.  For example in elevators or entrance of a passageway, people commonly accept smaller proximal distance.   Thus, the desired interpersonal distance is smaller and $d_ij^0$ is to be scaled down proportionally in these places.  
+
+In emergency escape The interpersonal distance is also smaller than in normal situation.  Based on social attachment theory people need to exchange information with familiar ones (e.g., friends or parents) to relieve stress in face of danger.  Affiliated with familiar and trust individuals relieves our stress.  The social norm is thus modified such that $d_ij^0$ is scaled down also.  The parameter of $A_i$ and $B_i$ may also be scaled down so that the social force as a whole is reduced in such an occasion (Korhonen, 2017).   
+   
+A common result of scaling down $d_ij^0$ is that competitive behavior may emerge in crowd.  In other words the physical force becomes effective among people and they may have more physical interaction at bottlenecks.  As physical force is intensified, someone may fall down.  The falling-down people become obstacle to others and thus slow down the egress flow, and they may cause others to fall down and this is so-called stampede disaster in crowd event.  In sum the social force model with $d_ij^0$ is useful to investigate crowd behavior when jointly used with a falling-down model.  As below FDS+Evac is used to realize the falling-down event where a pedestrian falls down when the physical force exceeds a threshold.      
+
+
+\clearpage
+
+\newpage
+
+\addcontentsline{toc}{chapter}{References}
+\renewcommand{\bibname}{References}
+\begin{thebibliography}{99}
+%
+\bibitem{Rinne10} Rinne, T., Tillander, K., and Grönberg, P., ``Data
+  Collection and Analysis of Evacuation Situations,'' VTT Research
+  Notes 2562, VTT Technical Research Centre of Finland , Espoo,
+  Finland, 2010 (http://www.vtt.fi/publications/index.jsp).
+%
+\bibitem{Heliovaara12} Heli\"ovaara, S., Korhonen, T., Hostikka, S.,
+  and Ehtamo, H., ``Counterflow model for agent-based simulation of
+  crowd dynamics'',  \emph{Building and Environment} 48: 89--100, 2012.
+%
+\end{thebibliography}
+
+\end{document} 
