@@ -31,7 +31,7 @@ In the above diagram environmental factors include facilities (e.g., alarm, guid
 
 \section{Adapting Desired Velocity To Environmental Stressors}
 
-When the fire/smoke spread towards people, people normally desire moving faster to escape from danger (Proulx , 1993; Ozel, 2001; Kuligowski, 2009).  Thus, we suggest that the desired velocity $\mathbf{v}_i^0$ should be increased when smoke density increases, and correspondingly the self-driving force is increased.  The fact that people may slow down in smoke areas is instead characterized by adding a resistance force which is proportional to the smoke density (SOOT_DENS).  This force describes how smoke impedes people's motion.  As a result, both of the self-driving force and smoke resistance are increased when people are walking in smoke areas.  If the self-driving force is larger than the resistance, people will accelerate, otherwise people will slow down (See Figure 1).  
+When the fire/smoke spread towards people, people normally desire moving faster to escape from danger ~\cite{Proulx1993, Ozel2001} (Proulx , 1993; Ozel, 2001; Kuligowski, 2009).  Thus, we suggest that the desired velocity $\mathbf{v}_i^0$ should be increased when smoke density increases, and correspondingly the self-driving force is increased.  The fact that people may slow down in smoke areas is instead characterized by adding a resistance force which is proportional to the smoke density (SOOT_DENS).  This force describes how smoke impedes people's motion.  As a result, both of the self-driving force and smoke resistance are increased when people are walking in smoke areas.  If the self-driving force is larger than the resistance, people will accelerate, otherwise people will slow down (See Figure 1).  
 
 %In the simulation core there are four types of entities: agents, walls, doors and exits.
 %\textbf{Walls}: Walls are obstruction in a compartment geometry that confine agent %movement, and they set up the boundary of a room or certain space.  
@@ -69,6 +69,11 @@ In emergency escape The interpersonal distance is also smaller than in normal si
 A common result of scaling down $d_ij^0$ is that competitive behavior may emerge in crowd.  In other words the physical force becomes effective among people and they may have more physical interaction at bottlenecks.  As physical force is intensified, someone may fall down.  The falling-down people become obstacle to others and thus slow down the egress flow, and they may cause others to fall down and this is so-called stampede disaster in crowd event.  In sum the social force model with $d_ij^0$ is useful to investigate crowd behavior when jointly used with a falling-down model.  As below FDS+Evac is used to realize the falling-down event where a pedestrian falls down when the physical force exceeds a threshold.      
 
 
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+
+\noindent The author is thankful to Dr.\ Peter Luh and Dr.\ Kerry Marsh for helpful comments on earlier work in University of Connecticut.   The author is also grateful to Dr.\ Timo Korhonen for helpful discussion in simulation work of FDS+Evac.  The author appreciates the  research program funded by NSF Grant # CMMI-1000495 (NSF Program Name: Building Emergency Evacuation - Innovative Modeling and Optimization).  
+
 \clearpage
 
 \newpage
@@ -76,15 +81,64 @@ A common result of scaling down $d_ij^0$ is that competitive behavior may emerge
 \addcontentsline{toc}{chapter}{References}
 \renewcommand{\bibname}{References}
 \begin{thebibliography}{99}
+
 %
-\bibitem{Rinne10} Rinne, T., Tillander, K., and Grönberg, P., ``Data
-  Collection and Analysis of Evacuation Situations,'' VTT Research
-  Notes 2562, VTT Technical Research Centre of Finland , Espoo,
-  Finland, 2010 (http://www.vtt.fi/publications/index.jsp).
+\bibitem{SV_UserGuide} Forney, G.P., ``Smokeview, A Tool for
+  Visualizing Fire Dynamics Simulation Data, Volume I: User's Guide'',
+  NIST Special Publication 1017-1 6th Edition, National Institute of
+  Standards and Technology, Gaithersburg, MA, June 2016, 188~p.
 %
-\bibitem{Heliovaara12} Heli\"ovaara, S., Korhonen, T., Hostikka, S.,
-  and Ehtamo, H., ``Counterflow model for agent-based simulation of
-  crowd dynamics'',  \emph{Building and Environment} 48: 89--100, 2012.
+\bibitem{SV_TechGuide} Forney, G.P., ``Smokeview (Version 6.1.5) - A
+  Tool for Visualizing Fire Dynamics Simulation Data, Volume II:
+  Technical Reference Guide'', NIST Special Publication 1017-1,
+  National Institute of Standards and Technology, Gaithersburg, MA,
+  August 2013, 70~p.
+%
+\bibitem{SV_VVGuide} Forney, G.P., ``Smokeview (Version 6.1.5) - A
+  Tool for Visualizing Fire Dynamics Simulation Data, Volume III:
+  Verification Guide'', NIST Special Publication 1017-3, National
+  Institute of Standards and Technology, Gaithersburg, MA, November
+  2013, 88~p.
+
+%
+\bibitem{Helbing95} Helbing, D., and Moln\'ar, P., ``Social force
+  model for pedestrian dynamics'', \emph{Physical Review E} 51:
+  4282--4286 (1995).
+%
+\bibitem{Helbing00} Helbing, D., Farkas, I., and Vicsek, T.,
+  ``Simulating dynamical features of escape panic'', \emph{Nature}
+  407: 487--490 (2000).
+%
+% Next is for book
+\bibitem{Helbing02} Helbing, D., Farkas, I., Moln\'ar, P., and
+  Vicsek,T., ``Simulating of Pedestrian Crowds in Normal and
+  Evacuation Situations'', \emph{Pedestrian and Evacuation Dynamics},
+  Schreckenberg, M. and Sharma, S.D. (eds.), Springer, Berlin, 2002,
+  pp.~21--58.
+
+%
+\bibitem{Proulx1993} Proulx, G., ``A Stress Model for People Facing a
+  Fire'', \emph{Journal of Environmental Psychology} 13: 137--147,
+  1993.
+%
+%\bibitem{Fang03} Fang, Z., Lo, S.M.\ and Lu, J.A., ``On the
+%  Relationship between Crowd Density and Movement Velocity'',
+%  \emph{Fire Safety Journal} 38: 271--283, 2003.
+%
+
+\bibitem{IMO07} IMO, ``Guidelines for Evacuation Analyses for
+  New and Existing Passenger Ships'', MSC/Circ.1238, International
+  Maritime Organization, London, UK, 30 October 2007.
+  
+%\bibitem{Rinne10} Rinne, T., Tillander, K., and Grönberg, P., ``Data
+%  Collection and Analysis of Evacuation Situations,'' VTT Research
+%  Notes 2562, VTT Technical Research Centre of Finland , Espoo,
+%  Finland, 2010 (http://www.vtt.fi/publications/index.jsp).
+%
+
+%\bibitem{Heliovaara12} Heli\"ovaara, S., Korhonen, T., Hostikka, S.,
+%  and Ehtamo, H., ``Counterflow model for agent-based simulation of
+%  crowd dynamics'',  \emph{Building and Environment} 48: 89--100, 2012.
 %
 \end{thebibliography}
 
