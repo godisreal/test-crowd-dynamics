@@ -10,7 +10,7 @@ If you would like to run the input file, please use fds6_dump205.exe to run exam
 
 Major revision of source code is evac.f90, and it is from the original source in FDS repository.  If you would like to compile a version by yourself, please take a look at the instruction in FDS official websit.  
 
-Since 2022 evac module has been decoupled from fds, and Timo is trying to provide a new version of evac and it may become a new independent project from fds. If you you have any valuable comment or suggestion, please feel free to send a message to Timo or me, or directly start an issue here.  (Open discussion on Github is preferable because sometimes my mailbox is blocked in China Mainland.)  Your comments are much appreciated.  Have fun!
+Since 2022 evac module has been decoupled from fds, and Timo is trying to provide a new version of evac and it may become a new independent project from fds. If you you have any valuable comment or suggestion, please feel free to send a message to Timo or me, or directly start an issue here.  Your comments are much appreciated.  Have fun!
 
 ![](https://github.com/godisreal/test-group-dynamics/blob/master/img/groups.PNG)
 ![](https://github.com/godisreal/test-group-dynamics/blob/master/img/Ex2018Test-SmokeFED_0036.png)
